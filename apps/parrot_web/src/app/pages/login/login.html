@@ -1,0 +1,36 @@
+<div class="auth-page">
+  <div class="auth-card panel">
+    <div class="brand-col">
+      <h1>Parrot <span class="gradient-text">Social</span></h1>
+      <img class="parrot-illustration" src="parrot_image.png" alt="Parrot Social illustration" />
+    </div>
+
+    <form class="form-col" [formGroup]="form" (ngSubmit)="submit()">
+      <input
+        class="input"
+        type="text"
+        placeholder="email or username"
+        formControlName="identifier"
+      />
+      @if (submitted() && form.controls.identifier.invalid) {
+        <span class="field-error">Email or username is required.</span>
+      }
+
+      <input class="input" type="password" placeholder="pass*word" formControlName="password" />
+      @if (submitted() && form.controls.password.invalid) {
+        <span class="field-error">Password is required.</span>
+      }
+
+      @if (error()) {
+        <span class="field-error">Could not log in. Please check your details.</span>
+      }
+
+      <button type="submit" class="btn btn-primary login-btn">LOGIN</button>
+
+      <p class="switch-link">
+        Don't have an account?
+        <a class="gradient-text" routerLink="/register"><strong>Register</strong></a> yourself now
+      </p>
+    </form>
+  </div>
+</div>

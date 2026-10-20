@@ -1,0 +1,12 @@
+.settings-page {
+  padding: 24px;
+}
+
+h1 {
+  margin: 0 0 16px;
+}
+
+.saved-msg {
+  color: var(--primary-strong);
+  font-weight: 600;
+}

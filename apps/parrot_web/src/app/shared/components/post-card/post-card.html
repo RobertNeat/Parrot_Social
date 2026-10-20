@@ -1,0 +1,87 @@
+<article class="post panel">
+  <header class="post-header">
+    <img
+      class="avatar"
+      [src]="post().authorAvatarUrl"
+      [alt]="post().authorName"
+      width="40"
+      height="40"
+    />
+    <span class="author-name">{{ post().authorName }}</span>
+    @if (ownPost()) {
+      <div class="menu-wrap">
+        <button type="button" class="btn btn-icon" (click)="toggleMenu()" aria-label="Post options">
+          <span class="material-symbols-outlined">more_vert</span>
+        </button>
+        @if (menuOpen()) {
+          <div class="menu-dropdown">
+            <button type="button" (click)="onDelete()">Delete post</button>
+          </div>
+        }
+      </div>
+    }
+  </header>
+
+  @if (post().imageUrl) {
+    <img class="post-image" [src]="post().imageUrl" alt="" />
+  }
+
+  <div class="post-actions">
+    <button
+      type="button"
+      class="btn btn-icon"
+      [class.active]="post().liked"
+      (click)="like.emit(post().id)"
+      aria-label="Like"
+    >
+      <span class="material-symbols-outlined">favorite</span>
+    </button>
+    <button
+      type="button"
+      class="btn btn-icon"
+      [class.active]="post().upvoted"
+      (click)="upvote.emit(post().id)"
+      aria-label="Upvote"
+    >
+      <span class="material-symbols-outlined">thumb_up</span>
+    </button>
+    <button type="button" class="btn btn-icon" (click)="toggleComments()" aria-label="Comments">
+      <span class="material-symbols-outlined">chat_bubble</span>
+    </button>
+  </div>
+
+  <p class="like-count">{{ post().likeCount }} likes</p>
+  <p class="post-text">{{ post().text }}</p>
+
+  @if (commentsOpen() && post().comments.length) {
+    <ul class="comment-list">
+      @for (comment of post().comments; track comment.id) {
+        <li>
+          <img
+            class="avatar"
+            [src]="comment.authorAvatarUrl"
+            [alt]="comment.authorName"
+            width="24"
+            height="24"
+          />
+          <span
+            ><strong>{{ comment.authorName }}</strong> {{ comment.text }}</span
+          >
+        </li>
+      }
+    </ul>
+  }
+
+  <form class="comment-form" (ngSubmit)="submitComment()">
+    <input
+      class="input"
+      type="text"
+      name="comment"
+      placeholder="write a comment ..."
+      [(ngModel)]="commentText"
+    />
+    <button type="submit" class="btn btn-icon" aria-label="Send comment">
+      <span class="material-symbols-outlined">send</span>
+    </button>
+  </form>
+</article>

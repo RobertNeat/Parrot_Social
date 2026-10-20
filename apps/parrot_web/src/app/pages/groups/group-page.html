@@ -1,0 +1,57 @@
+@if (group(); as group) {
+  <div class="group-layout">
+    <section class="group-main">
+      <div class="group-header panel">
+        <div class="group-avatar"></div>
+        <div>
+          <h1>{{ group.name }}</h1>
+          <p>{{ group.description }}</p>
+        </div>
+      </div>
+
+      <div class="posts-grid" #postsGrid>
+        @for (column of postColumns(); track $index) {
+          <div class="posts-col">
+            @for (post of column; track post.id) {
+              <app-post-card
+                [post]="post"
+                (like)="like($event)"
+                (upvote)="upvote($event)"
+                (comment)="comment($event)"
+              />
+            }
+          </div>
+        }
+      </div>
+    </section>
+
+    <aside class="group-side panel">
+      <h3>Owner:</h3>
+      <ul class="owner-list">
+        <li>{{ group.ownerName }}</li>
+      </ul>
+
+      <button
+        type="button"
+        class="btn"
+        [class.btn-primary]="!group.joined"
+        [class.btn-outline-gradient]="group.joined"
+        (click)="toggleMembership()"
+      >
+        <span class="material-symbols-outlined">{{
+          group.joined ? 'remove_circle' : 'add_circle'
+        }}</span>
+        {{ group.joined ? 'Leave' : 'Join' }}
+      </button>
+
+      <h3>Members:</h3>
+      <ul class="member-list">
+        @for (member of group.members; track member) {
+          <li>{{ member }},</li>
+        }
+      </ul>
+    </aside>
+  </div>
+} @else {
+  <p class="not-found">Group not found. <a routerLink="/groups">Back to groups</a></p>
+}

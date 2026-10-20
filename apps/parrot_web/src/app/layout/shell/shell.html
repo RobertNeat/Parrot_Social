@@ -1,0 +1,134 @@
+<div class="shell">
+  <header class="topbar">
+    <button
+      type="button"
+      class="btn btn-icon hamburger"
+      (click)="toggleMobileNav()"
+      aria-label="Toggle menu"
+    >
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+    <div class="brand">Parrot <strong>Social</strong></div>
+    <div class="search">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        class="input"
+        type="search"
+        placeholder="Search for friends, posts ..."
+        [(ngModel)]="searchTerm"
+      />
+    </div>
+  </header>
+
+  <div class="body">
+    <aside class="sidebar panel" [class.open]="mobileNavOpen()">
+      <a class="profile-card" routerLink="/profile" (click)="closeMobileNav()">
+        <img class="avatar" [src]="auth.currentUser()?.avatarUrl" alt="" width="56" height="56" />
+        <span class="profile-name gradient-text"
+          >{{ auth.currentUser()?.firstName }} {{ auth.currentUser()?.lastName }}</span
+        >
+      </a>
+
+      <nav class="nav-grid">
+        <a
+          class="btn btn-panel nav-btn"
+          routerLink="/feed"
+          routerLinkActive="active"
+          (click)="closeMobileNav()"
+        >
+          <span class="material-symbols-outlined">rss_feed</span>
+          <span class="nav-label">Feed</span>
+        </a>
+        <a
+          class="btn btn-panel nav-btn"
+          routerLink="/chat"
+          routerLinkActive="active"
+          (click)="closeMobileNav()"
+        >
+          <span class="material-symbols-outlined">chat</span>
+          <span class="nav-label">Chat</span>
+        </a>
+        <a
+          class="btn btn-panel nav-btn"
+          routerLink="/groups"
+          routerLinkActive="active"
+          (click)="closeMobileNav()"
+        >
+          <span class="material-symbols-outlined">groups</span>
+          <span class="nav-label">Groups</span>
+        </a>
+        <a
+          class="btn btn-panel nav-btn"
+          routerLink="/events"
+          routerLinkActive="active"
+          (click)="closeMobileNav()"
+        >
+          <span class="material-symbols-outlined">calendar_month</span>
+          <span class="nav-label">Events</span>
+        </a>
+        <a
+          class="btn btn-panel nav-btn"
+          routerLink="/notifications"
+          routerLinkActive="active"
+          (click)="closeMobileNav()"
+        >
+          <span class="material-symbols-outlined">notifications</span>
+          <span class="nav-label">Notifications</span>
+          @if (notifications.unreadCount() > 0) {
+            <span class="badge">{{ notifications.unreadCount() }}</span>
+          }
+        </a>
+        <a
+          class="btn btn-panel nav-btn"
+          routerLink="/messages"
+          routerLinkActive="active"
+          (click)="closeMobileNav()"
+        >
+          <span class="material-symbols-outlined">mail</span>
+          <span class="nav-label">Messages</span>
+        </a>
+        <a
+          class="btn btn-panel nav-btn"
+          routerLink="/settings"
+          routerLinkActive="active"
+          (click)="closeMobileNav()"
+        >
+          <span class="material-symbols-outlined">settings</span>
+          <span class="nav-label">Settings</span>
+        </a>
+        <button type="button" class="btn btn-panel nav-btn" (click)="logout()">
+          <span class="material-symbols-outlined">logout</span>
+          <span class="nav-label">Logout</span>
+        </button>
+      </nav>
+
+      <ul class="friend-list">
+        @for (friend of friends; track friend.id) {
+          <li>
+            <img
+              class="avatar"
+              [src]="friend.avatarUrl"
+              [alt]="friend.firstName"
+              width="36"
+              height="36"
+            />
+            <span>{{ friend.firstName }} {{ friend.lastName }}</span>
+          </li>
+        }
+      </ul>
+    </aside>
+
+    @if (mobileNavOpen()) {
+      <button
+        type="button"
+        class="backdrop"
+        (click)="closeMobileNav()"
+        aria-label="Close menu"
+      ></button>
+    }
+
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

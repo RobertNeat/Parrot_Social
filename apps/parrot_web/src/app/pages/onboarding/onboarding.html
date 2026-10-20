@@ -1,0 +1,16 @@
+<div class="onboarding-page">
+  <div class="onboarding-card panel">
+    <h1 class="gradient-text">Personal information</h1>
+    <p class="subtitle">
+      This form is optional and you can fill out personal information in your
+      <strong class="gradient-text">PROFILE</strong> whenever you want.
+    </p>
+
+    <app-personal-info-form
+      [user]="auth.currentUser()"
+      [showSkip]="true"
+      (save)="save($event)"
+      (skip)="skip()"
+    />
+  </div>
+</div>

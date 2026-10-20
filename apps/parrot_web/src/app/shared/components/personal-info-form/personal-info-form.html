@@ -1,0 +1,45 @@
+<form class="info-form" [formGroup]="form" (ngSubmit)="submit()">
+  <div class="fields-col">
+    <input class="input" type="text" placeholder="name" formControlName="firstName" />
+    <input class="input" type="text" placeholder="surname" formControlName="lastName" />
+    <textarea class="textarea" placeholder="profile description" formControlName="bio"></textarea>
+
+    <select class="select" formControlName="relationship">
+      <option value="">relationship</option>
+      <option value="Single">Single</option>
+      <option value="In a relationship">In a relationship</option>
+      <option value="Married">Married</option>
+    </select>
+
+    <div class="icon-field">
+      <span class="material-symbols-outlined">location_on</span>
+      <input class="input" type="text" placeholder="inhabitancy" formControlName="inhabitance" />
+      <span class="material-symbols-outlined">school</span>
+      <input class="input" type="text" placeholder="education" formControlName="education" />
+    </div>
+    <div class="icon-field">
+      <span class="material-symbols-outlined">home</span>
+      <input class="input" type="text" placeholder="provenance" formControlName="provenance" />
+      <span class="material-symbols-outlined">work</span>
+      <input class="input" type="text" placeholder="work" formControlName="work" />
+    </div>
+  </div>
+
+  <div class="images-col">
+    <div class="image-placeholder">
+      <span class="material-symbols-outlined">image</span>
+      <span>profile image</span>
+    </div>
+    <div class="image-placeholder">
+      <span class="material-symbols-outlined">image</span>
+      <span>cover image</span>
+    </div>
+  </div>
+
+  <div class="actions-row">
+    @if (showSkip()) {
+      <button type="button" class="btn btn-outline-gradient" (click)="skip.emit()">skip</button>
+    }
+    <button type="submit" class="btn btn-primary">SAVE</button>
+  </div>
+</form>

@@ -1,0 +1,7 @@
+<div class="settings-page panel">
+  <h1>Settings</h1>
+  @if (saved()) {
+    <p class="saved-msg">Your profile has been updated.</p>
+  }
+  <app-personal-info-form [user]="auth.currentUser()" [showSkip]="false" (save)="save($event)" />
+</div>

@@ -1,0 +1,45 @@
+.notifications-page {
+  padding: 20px;
+}
+
+.notifications-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.notifications-header h1 {
+  margin: 0;
+}
+
+.notification-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.notification-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 10px;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.notification-item.unread {
+  background: var(--panel-strong);
+  border-radius: var(--radius-sm);
+}
+
+.notification-text {
+  flex: 1;
+}
+
+.time-ago {
+  color: var(--text-on-panel-muted);
+  font-size: 0.8rem;
+}

@@ -1,0 +1,82 @@
+@if (profile(); as profile) {
+  <div class="profile-layout">
+    <section class="profile-main">
+      <div class="cover panel" [style.backgroundImage]="'url(' + profile.coverUrl + ')'">
+        <div class="cover-overlay">
+          <img class="avatar cover-avatar" [src]="profile.avatarUrl" [alt]="profile.firstName" />
+          <div class="cover-text">
+            <h1>{{ profile.firstName }} {{ profile.lastName }}</h1>
+            <p>{{ profile.bio }}</p>
+          </div>
+        </div>
+      </div>
+
+      @if (isOwnProfile()) {
+        <div class="composer panel">
+          <img class="avatar" [src]="profile.avatarUrl" alt="" width="40" height="40" />
+          <span class="composer-placeholder">What's in your mind {{ profile.firstName }}?</span>
+          <button type="button" class="btn btn-icon" aria-label="Add image">
+            <span class="material-symbols-outlined">image</span>
+          </button>
+          <button type="button" class="btn btn-primary">Share</button>
+        </div>
+      }
+
+      <div class="posts-grid" #postsGrid>
+        @for (column of postColumns(); track $index) {
+          <div class="posts-col">
+            @for (post of column; track post.id) {
+              <app-post-card
+                [post]="post"
+                [ownPost]="isOwnProfile()"
+                (like)="like($event)"
+                (upvote)="upvote($event)"
+                (comment)="comment($event)"
+                (remove)="remove($event)"
+              />
+            }
+          </div>
+        }
+      </div>
+    </section>
+
+    <aside class="info-panel panel">
+      <h2>Additional information:</h2>
+      <ul>
+        @if (profile.work) {
+          <li>
+            <span>work: {{ profile.work }}</span
+            ><span class="material-symbols-outlined">work</span>
+          </li>
+        }
+        @if (profile.education) {
+          <li>
+            <span>education: {{ profile.education }}</span
+            ><span class="material-symbols-outlined">school</span>
+          </li>
+        }
+        @if (profile.relationship) {
+          <li>
+            <span>relationship: {{ profile.relationship }}</span
+            ><span class="material-symbols-outlined">favorite</span>
+          </li>
+        }
+        @if (profile.inhabitance) {
+          <li>
+            <span>inhabitance: {{ profile.inhabitance }}</span
+            ><span class="material-symbols-outlined">location_on</span>
+          </li>
+        }
+        @if (profile.provenance) {
+          <li>
+            <span>provenance: {{ profile.provenance }}</span
+            ><span class="material-symbols-outlined">home</span>
+          </li>
+        }
+      </ul>
+      <p class="member-since">On platform since: {{ profile.memberSince }}</p>
+    </aside>
+  </div>
+} @else {
+  <p class="not-found">User not found.</p>
+}

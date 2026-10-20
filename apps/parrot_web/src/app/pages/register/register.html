@@ -1,0 +1,34 @@
+<div class="auth-page">
+  <form class="auth-card panel" [formGroup]="form" (ngSubmit)="submit()">
+    <input class="input" type="text" placeholder="username" formControlName="username" />
+    @if (submitted() && form.controls.username.invalid) {
+      <span class="field-error">Username is required.</span>
+    }
+
+    <input class="input" type="email" placeholder="email" formControlName="email" />
+    @if (submitted() && form.controls.email.invalid) {
+      <span class="field-error">A valid email is required.</span>
+    }
+
+    <input class="input" type="password" placeholder="pass*word" formControlName="password" />
+    @if (submitted() && form.controls.password.invalid) {
+      <span class="field-error">Password must be at least 6 characters.</span>
+    }
+
+    <input
+      class="input"
+      type="password"
+      placeholder="retype pass*word"
+      formControlName="confirmPassword"
+    />
+    @if (submitted() && form.errors?.['passwordMismatch']) {
+      <span class="field-error">Passwords do not match.</span>
+    }
+
+    <button type="submit" class="btn btn-outline-gradient register-btn">REGISTER</button>
+
+    <p class="switch-link">
+      Or <a class="gradient-text" routerLink="/login"><strong>LOGIN</strong></a> if you have account
+    </p>
+  </form>
+</div>

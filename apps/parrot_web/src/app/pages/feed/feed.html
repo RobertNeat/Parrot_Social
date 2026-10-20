@@ -1,0 +1,94 @@
+<div class="feed-layout">
+  <section class="feed-main">
+    <div class="composer panel">
+      <img class="avatar" [src]="auth.currentUser()?.avatarUrl" alt="" width="44" height="44" />
+      <div class="composer-fields">
+        <span class="composer-name"
+          >{{ auth.currentUser()?.firstName }} {{ auth.currentUser()?.lastName }}</span
+        >
+        <input
+          class="input"
+          type="text"
+          [placeholder]="'What’s in your mind ' + auth.currentUser()?.firstName + '?'"
+          [(ngModel)]="newPostText"
+          (keyup.enter)="share()"
+        />
+      </div>
+      <button type="button" class="btn btn-icon" aria-label="Add image">
+        <span class="material-symbols-outlined">image</span>
+      </button>
+      <button type="button" class="btn btn-primary" (click)="share()">Share</button>
+    </div>
+
+    <div class="posts-grid" #postsGrid>
+      @for (column of postColumns(); track $index) {
+        <div class="posts-col">
+          @for (post of column; track post.id) {
+            <app-post-card
+              [post]="post"
+              [ownPost]="post.authorId === auth.currentUser()?.id"
+              (like)="like($event)"
+              (upvote)="upvote($event)"
+              (comment)="comment($event)"
+              (remove)="remove($event)"
+            />
+          }
+        </div>
+      }
+    </div>
+  </section>
+
+  <aside class="side-panel panel">
+    <ul class="contact-list">
+      @for (contact of contacts; track contact.id) {
+        <li>
+          <img
+            class="avatar"
+            [src]="contact.avatarUrl"
+            [alt]="contact.firstName"
+            width="32"
+            height="32"
+          />
+          <span>{{ contact.firstName }} {{ contact.lastName }}</span>
+        </li>
+      }
+      <li class="mail-row">
+        <span class="material-symbols-outlined">mail</span>
+      </li>
+    </ul>
+
+    <div class="mini-chat">
+      <select
+        class="select"
+        [ngModel]="activeConversationId()"
+        (ngModelChange)="selectConversation($event)"
+      >
+        @for (conversation of chat.conversations(); track conversation.id) {
+          <option [value]="conversation.id">{{ conversation.contactName }}</option>
+        }
+      </select>
+
+      <div class="mini-chat-messages">
+        @for (message of activeConversation()?.messages; track message.id) {
+          <p class="bubble" [class.mine]="message.fromMe">{{ message.text }}</p>
+        }
+      </div>
+
+      <div class="mini-chat-input">
+        <input
+          class="input"
+          type="text"
+          placeholder="write a message ..."
+          [(ngModel)]="messageText"
+          (keyup.enter)="sendMessage()"
+        />
+        <button type="button" class="btn btn-icon" (click)="sendMessage()" aria-label="Send">
+          <span class="material-symbols-outlined">send</span>
+        </button>
+        <button type="button" class="btn btn-icon" aria-label="Attach image">
+          <span class="material-symbols-outlined">image</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+</div>

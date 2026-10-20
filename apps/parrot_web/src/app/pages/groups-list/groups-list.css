@@ -1,0 +1,36 @@
+.groups-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.group-card {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--text-on-panel);
+}
+
+.group-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.group-info h3 {
+  margin: 0 0 6px;
+}
+
+.group-info p {
+  margin: 0;
+  color: var(--text-on-panel-muted);
+  font-size: 0.9rem;
+}
+
+.member-count {
+  font-size: 0.8rem;
+  color: var(--text-on-panel-muted);
+}
