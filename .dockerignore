@@ -1,0 +1,15 @@
+node_modules
+**/node_modules
+dist
+**/dist
+.angular
+**/.angular
+coverage
+**/coverage
+.git
+.github
+docs
+*.log
+.env
+.env.*
+!.env.example

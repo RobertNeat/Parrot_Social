@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/latest/dbchangelog.xsd">
+
+    <!-- Seeder danych startowych. Na razie pusty - dodawaj changesety z
+         danymi referencyjnymi/demo w miarę potrzeb aplikacji. Uruchamiany
+         tylko w kontekście "seed" (PARROT_SEED_DATA=true), zob. compose.yml. -->
+
+</databaseChangeLog>

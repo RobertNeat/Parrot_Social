@@ -1,0 +1,106 @@
+# Kanoniczny stos Parrot Social: produkcja i lokalnie.
+#  - produkcja: deploy_compose_ssh.sh kopiuje na host TYLKO ten plik
+#    (+ liquibase/, config.env, projects.env); obrazy z rejestru, brak `build:`.
+#  - lokalnie: nakładka compose.dev.yml (build, porty na loopback) + .env:
+#      docker compose -f deploy/compose.yml -f deploy/compose.dev.yml --env-file .env up -d --build
+# Wartości domyślne `:-` (obrazy/porty = projects.json) pozwalają uruchamiać stos
+# bez projects.env; zgodność z projects.json pilnuje validate_projects.sh.
+#
+# Dostępność usług: `parrot-web` i `parrot-api` są wywoływane bezpośrednio z
+# przeglądarki, dlatego publikują port na hoście.
+#
+# Dane: tylko `parrot-api` czyta/pisze do PostgreSQL. Migracje schematu i
+# seed danych wykonuje jednorazowy kontener `liquibase` przed startem
+# `parrot-api` (depends_on: service_completed_successfully).
+name: parrot-social
+
+services:
+  postgres:
+    # Pull-through przez ZOT (sync z registry-1.docker.io) zamiast Docker Hub
+    # bezpośrednio - ten sam rejestr co bazowe obrazy w .github/docker/*.Dockerfile.
+    image: 192.168.1.162:5000/library/postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${PARROT_DB_NAME:?PARROT_DB_NAME is required in config.env}
+      POSTGRES_USER: ${PARROT_DB_USER:?PARROT_DB_USER is required in config.env}
+      POSTGRES_PASSWORD: ${PARROT_DB_PASSWORD:?PARROT_DB_PASSWORD is required in config.env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - parrot-internal
+
+  liquibase:
+    image: 192.168.1.162:5000/liquibase/liquibase:4.33-alpine
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./liquibase:/liquibase/changelog:ro
+    environment:
+      LIQUIBASE_COMMAND_URL: jdbc:postgresql://postgres:5432/${PARROT_DB_NAME:-parrot_social}
+      LIQUIBASE_COMMAND_USERNAME: ${PARROT_DB_USER:-parrot}
+      LIQUIBASE_COMMAND_PASSWORD: ${PARROT_DB_PASSWORD:-parrot}
+      LIQUIBASE_COMMAND_CHANGELOG_FILE: /liquibase/changelog/changelog-master.xml
+      LIQUIBASE_COMMAND_CONTEXTS: ${PARROT_SEED_DATA:+seed}
+    command: ["update"]
+    networks:
+      - parrot-internal
+
+  parrot-api:
+    image: ${REGISTRY:-local}/${PARROT_API_IMAGE:-parrot-social/parrot-api}:${IMAGE_TAG:-dev}
+    restart: unless-stopped
+    env_file:
+      - path: config.env
+        required: false
+    environment:
+      PORT: ${PARROT_API_CONTAINER_PORT:-10710}
+      DATABASE_URL: postgresql://${PARROT_DB_USER:-parrot}:${PARROT_DB_PASSWORD:-parrot}@postgres:5432/${PARROT_DB_NAME:-parrot_social}
+      PARROT_WEB_ORIGIN: ${PARROT_WEB_ORIGIN:-http://localhost:10700}
+    depends_on:
+      liquibase:
+        condition: service_completed_successfully
+    ports:
+      - "${PARROT_API_HOST_PORT:-10710}:${PARROT_API_CONTAINER_PORT:-10710}"
+    networks:
+      - default
+      - parrot-internal
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q -O /dev/null http://127.0.0.1:${PARROT_API_CONTAINER_PORT:-10710}/ || exit 1"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  parrot-web:
+    image: ${REGISTRY:-local}/${PARROT_WEB_IMAGE:-parrot-social/parrot-web}:${IMAGE_TAG:-dev}
+    restart: unless-stopped
+    ports:
+      - "${PARROT_WEB_HOST_PORT:-10700}:${PARROT_WEB_CONTAINER_PORT:-10700}"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q -O /dev/null http://127.0.0.1:${PARROT_WEB_CONTAINER_PORT:-10700}/ || exit 1"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+networks:
+  parrot-internal:
+    internal: true
+
+volumes:
+  postgres-data:

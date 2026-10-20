@@ -1,0 +1,54 @@
+{
+  "schema_version": 2,
+  "pipeline": {
+    "runner_labels": ["self-hosted", "Linux", "X64", "production"],
+    "project_roots": ["apps"]
+  },
+  "projects": [
+    {
+      "name": "parrot-api",
+      "type": "node",
+      "framework": "nestjs",
+      "version": "24",
+      "path": "apps/parrot_api",
+      "package_manager": "pnpm",
+      "build_tool": null,
+      "check_script": "check",
+      "dockerfile": ".github/docker/node.Dockerfile",
+      "image": "parrot-social/parrot-api",
+      "package_name": "@parrot-social/parrot_api",
+      "Trivy_exceptions": [],
+      "build_output": "dist",
+      "server_config": null,
+      "start_command": "node dist/main.js",
+      "ports": { "host": 10710, "container": 10710 }
+    },
+    {
+      "name": "parrot-web",
+      "type": "node",
+      "framework": "angular",
+      "version": "24",
+      "path": "apps/parrot_web",
+      "package_manager": "pnpm",
+      "build_tool": null,
+      "check_script": "check",
+      "dockerfile": ".github/docker/angular.Dockerfile",
+      "image": "parrot-social/parrot-web",
+      "package_name": "@parrot-social/parrot_web",
+      "Trivy_exceptions": [],
+      "build_output": "apps/parrot_web/dist/parrot_web/browser",
+      "server_config": "apps/parrot_web/nginx.conf",
+      "start_command": null,
+      "ports": { "host": 10700, "container": 10700 }
+    }
+  ],
+  "deploy": {
+    "environment": "production",
+    "host": "192.168.1.160",
+    "user": "docker_deploy",
+    "registry": "192.168.1.162:5000",
+    "compose_file": "deploy/compose.yml",
+    "config_file": ".env.example",
+    "remote_dir": "/home/docker_deploy/parrot-social"
+  }
+}
