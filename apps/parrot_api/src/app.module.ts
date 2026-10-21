@@ -12,6 +12,7 @@ import { GroupsModule } from './groups/groups.module.js';
 import { EventsModule } from './events/events.module.js';
 import { ChatModule } from './chat/chat.module.js';
 import { NotificationsModule } from './notifications/notifications.module.js';
+import { SearchModule } from './search/search.module.js';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { NotificationsModule } from './notifications/notifications.module.js';
     EventsModule,
     ChatModule,
     NotificationsModule,
+    SearchModule,
   ],
   controllers: [AppController],
   providers: [

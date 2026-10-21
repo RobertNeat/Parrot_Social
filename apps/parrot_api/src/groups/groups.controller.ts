@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Delete,
   Get,
@@ -13,13 +14,14 @@ import {
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import type {
+  CreateGroupRequestDto,
   GroupDto,
   PagedResponseDto,
   PostDto,
 } from '@parrot-social/shared-dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { MediaRefBuilderService } from '../media/media-ref-builder.service.js';
-import { requireUuid } from '../common/validation.js';
+import { requireString, requireUuid } from '../common/validation.js';
 import { toGroupDto } from './group.mapper.js';
 import { GroupsRepository } from './groups.repository.js';
 import { PostsRepository } from '../posts/posts.repository.js';
@@ -58,6 +60,28 @@ export class GroupsController {
         );
       }),
     );
+  }
+
+  @Post()
+  async create(
+    @Body() body: CreateGroupRequestDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<GroupDto> {
+    const ownerId = userId(req);
+    const name = requireString(body.name, 'name', {
+      minLength: 1,
+      maxLength: 255,
+    });
+    const description = requireString(body.description, 'description', {
+      minLength: 1,
+    });
+    const groupId = await this.groupsRepository.create({
+      name,
+      description,
+      ownerId,
+    });
+    return this.loadGroupDto(groupId, ownerId, res);
   }
 
   @Get(':id')

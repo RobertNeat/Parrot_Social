@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import type { EventDto } from '@parrot-social/shared-dto';
+import type { CreateEventRequestDto, EventDto } from '@parrot-social/shared-dto';
 import { environment } from '../../../environments/environment';
 import { EventItem } from '../models/event.model';
 
@@ -30,6 +30,17 @@ export class EventsService {
   async load(): Promise<void> {
     const dtos = await firstValueFrom(this.http.get<EventDto[]>(this.baseUrl));
     this.events.set(dtos.map(toLocalEvent));
+  }
+
+  /** Returns true on success so the caller can clear/close its form. */
+  async createEvent(request: CreateEventRequestDto): Promise<boolean> {
+    try {
+      const dto = await firstValueFrom(this.http.post<EventDto>(this.baseUrl, request));
+      this.events.update((events) => [...events, toLocalEvent(dto)]);
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   async toggleInterested(eventId: string): Promise<void> {

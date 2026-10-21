@@ -75,6 +75,20 @@ export class UsersRepository {
     return result.rows;
   }
 
+  /** `likePattern` is a caller-prepared ILIKE pattern (already escaped) - matches username or
+   * full name, case-insensitively. */
+  async search(likePattern: string, limit: number): Promise<UserRow[]> {
+    const result = await this.pool.query<UserRow>(
+      `SELECT * FROM users
+       WHERE username ILIKE $1 ESCAPE '\\'
+          OR (first_name || ' ' || last_name) ILIKE $1 ESCAPE '\\'
+       ORDER BY first_name, last_name
+       LIMIT $2`,
+      [likePattern, limit],
+    );
+    return result.rows;
+  }
+
   async usernameOrEmailTaken(
     username: string,
     email: string,

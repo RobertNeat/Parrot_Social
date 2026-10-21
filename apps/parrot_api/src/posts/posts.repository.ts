@@ -188,6 +188,22 @@ export class PostsRepository {
     return result.rows;
   }
 
+  /** `likePattern` is a caller-prepared ILIKE pattern (already escaped) - matches post text. */
+  async search(
+    viewerId: string,
+    likePattern: string,
+    limit: number,
+  ): Promise<PostRow[]> {
+    const result = await this.pool.query<PostRow>(
+      `${POST_SELECT}
+       WHERE p.text ILIKE $2 ESCAPE '\\'
+       ORDER BY p.created_at DESC, p.id DESC
+       LIMIT $3`,
+      [viewerId, likePattern, limit],
+    );
+    return result.rows;
+  }
+
   async create(input: {
     authorId: string;
     text: string;

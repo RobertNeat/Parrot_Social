@@ -71,4 +71,26 @@ export class EventsRepository {
       [eventId, userId],
     );
   }
+
+  async create(input: {
+    title: string;
+    description: string;
+    startsAt: string;
+    imageMediaId?: string;
+    createdBy: string;
+  }): Promise<string> {
+    const result = await this.pool.query<{ id: string }>(
+      `INSERT INTO event (title, description, starts_at, image_media_id, created_by)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id`,
+      [
+        input.title,
+        input.description,
+        input.startsAt,
+        input.imageMediaId ?? null,
+        input.createdBy,
+      ],
+    );
+    return result.rows[0].id;
+  }
 }

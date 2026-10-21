@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- created_by (organizer) was missing from 006-events.xml. Added nullable first and
+         backfilled, because seed/004-seed-events.xml (already-applied changesets, checksums
+         fixed) inserts events with no created_by - a straight NOT NULL column would break both
+         that seed and any existing event rows in a dev DB that already ran it. -->
+    <changeSet id="011-event-created-by-add-column" author="robert.sereda">
+        <addColumn tableName="event">
+            <column name="created_by" type="uuid"/>
+        </addColumn>
+    </changeSet>
+
+    <!-- Backfill pre-existing/seeded rows to the oldest user account, so the NOT NULL
+         constraint below can be applied without deleting data. -->
+    <changeSet id="011-event-created-by-backfill" author="robert.sereda">
+        <sql>
+            UPDATE event SET created_by = (SELECT id FROM users ORDER BY created_at, id LIMIT 1)
+            WHERE created_by IS NULL AND EXISTS (SELECT 1 FROM users);
+        </sql>
+        <rollback/>
+    </changeSet>
+
+    <changeSet id="011-event-created-by-not-null" author="robert.sereda">
+        <addNotNullConstraint tableName="event" columnName="created_by" columnDataType="uuid"/>
+    </changeSet>
+
+    <!-- RESTRICT, same rationale as groups.owner_id in 004-groups.xml: deleting an organizer's
+         account shouldn't silently delete/orphan their event. -->
+    <changeSet id="011-event-created-by-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="event" baseColumnNames="created_by"
+            constraintName="fk_event_created_by"
+            referencedTableName="users" referencedColumnNames="id"
+            onDelete="RESTRICT"/>
+    </changeSet>
+
+</databaseChangeLog>

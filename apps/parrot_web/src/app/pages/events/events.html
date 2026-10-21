@@ -1,3 +1,36 @@
+<div class="events-toolbar">
+  @if (!formOpen()) {
+    <button type="button" class="btn btn-primary" (click)="openForm()">
+      <span class="material-symbols-outlined">add_circle</span>
+      Create event
+    </button>
+  }
+</div>
+
+@if (formOpen()) {
+  <div class="event-form panel">
+    <h3>Create event</h3>
+    <input class="input" type="text" placeholder="Title" [(ngModel)]="title" />
+    <textarea class="input" rows="3" placeholder="Description" [(ngModel)]="description"></textarea>
+    <input class="input" type="datetime-local" [(ngModel)]="startsAt" />
+    <input class="input" type="file" accept="image/*" (change)="onImageSelected($event)" />
+    @if (error()) {
+      <p class="form-error">{{ error() }}</p>
+    }
+    <div class="form-actions">
+      <button type="button" class="btn btn-outline-gradient" (click)="cancelForm()">Cancel</button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        [disabled]="submitting()"
+        (click)="submit()"
+      >
+        {{ submitting() ? 'Creating...' : 'Create' }}
+      </button>
+    </div>
+  </div>
+}
+
 <div class="events-grid">
   @for (event of eventsService.events(); track event.id) {
     <article class="event-card panel">

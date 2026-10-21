@@ -1,0 +1,55 @@
+<div class="search-results">
+  @if (searchService.loading()) {
+    <p class="search-status">Searching...</p>
+  } @else if (searchService.result().users.length === 0 && searchService.result().posts.length === 0) {
+    <p class="search-status">No results.</p>
+  }
+
+  @if (searchService.result().users.length > 0) {
+    <section class="panel search-section">
+      <h3>People</h3>
+      <ul class="search-user-list">
+        @for (user of searchService.result().users; track user.id) {
+          <li>
+            <a [routerLink]="['/profile', user.id]">
+              <img
+                class="avatar"
+                [src]="user.avatar?.url ?? 'resources/person/men_1.png'"
+                [alt]="user.firstName"
+                width="40"
+                height="40"
+              />
+              <span>{{ user.firstName }} {{ user.lastName }}</span>
+              <span class="username">&#64;{{ user.username }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+  @if (searchService.result().posts.length > 0) {
+    <section class="panel search-section">
+      <h3>Posts</h3>
+      <ul class="search-post-list">
+        @for (post of searchService.result().posts; track post.id) {
+          <li>
+            <a [routerLink]="['/profile', post.authorId]" class="search-post">
+              <img
+                class="avatar"
+                [src]="post.authorAvatarUrl"
+                [alt]="post.authorName"
+                width="32"
+                height="32"
+              />
+              <div class="search-post-body">
+                <span class="search-post-author">{{ post.authorName }}</span>
+                <p>{{ post.text }}</p>
+              </div>
+            </a>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+</div>

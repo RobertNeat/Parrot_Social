@@ -18,6 +18,7 @@
     <include file="changelog/008-notifications.xml" relativeToChangelogFile="true"/>
     <include file="changelog/009-friendship.xml" relativeToChangelogFile="true"/>
     <include file="changelog/010-indexes.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/011-event-organizer.xml" relativeToChangelogFile="true"/>
 
     <include file="seed/changelog-seed.xml" relativeToChangelogFile="true" context="seed"/>
 

@@ -1,4 +1,6 @@
 import {
+  BadRequestException,
+  Body,
   Controller,
   Delete,
   Get,
@@ -10,10 +12,19 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import type { EventDto } from '@parrot-social/shared-dto';
+import type {
+  CreateEventRequestDto,
+  EventDto,
+} from '@parrot-social/shared-dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { MediaRefBuilderService } from '../media/media-ref-builder.service.js';
-import { requireUuid } from '../common/validation.js';
+import { MediaStorageService } from '../media/media-storage.service.js';
+import {
+  optionalUuid,
+  requireIsoDate,
+  requireString,
+  requireUuid,
+} from '../common/validation.js';
 import { toEventDto } from './event.mapper.js';
 import { EventsRepository } from './events.repository.js';
 
@@ -23,6 +34,7 @@ export class EventsController {
   constructor(
     private readonly eventsRepository: EventsRepository,
     private readonly mediaRefBuilder: MediaRefBuilderService,
+    private readonly mediaStorage: MediaStorageService,
   ) {}
 
   @Get()
@@ -35,6 +47,39 @@ export class EventsController {
     return Promise.all(
       rows.map((row) => toEventDto(row, this.mediaRefBuilder, res)),
     );
+  }
+
+  @Post()
+  async create(
+    @Body() body: CreateEventRequestDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<EventDto> {
+    const organizerId = userId(req);
+    const title = requireString(body.title, 'title', {
+      minLength: 1,
+      maxLength: 255,
+    });
+    const description = requireString(body.description, 'description', {
+      minLength: 1,
+    });
+    const startsAt = requireIsoDate(body.startsAt, 'startsAt');
+    const imageAttachHandle = optionalUuid(
+      body.imageAttachHandle,
+      'imageAttachHandle',
+    );
+    const imageMediaId = imageAttachHandle
+      ? await this.resolveOwnedMediaId(imageAttachHandle, organizerId)
+      : undefined;
+
+    const eventId = await this.eventsRepository.create({
+      title,
+      description,
+      startsAt,
+      imageMediaId,
+      createdBy: organizerId,
+    });
+    return this.loadEventDto(eventId, organizerId, res);
   }
 
   @Post(':id/interested')
@@ -79,6 +124,22 @@ export class EventsController {
       throw new NotFoundException('Event not found');
     }
     return toEventDto(row, this.mediaRefBuilder, res);
+  }
+
+  private async resolveOwnedMediaId(
+    attachHandle: string,
+    ownerId: string,
+  ): Promise<string> {
+    const mediaId = await this.mediaStorage.findOwnedIdByAttachHandle(
+      attachHandle,
+      ownerId,
+    );
+    if (!mediaId) {
+      throw new BadRequestException(
+        'attachHandle does not refer to media owned by the caller',
+      );
+    }
+    return mediaId;
   }
 }
 

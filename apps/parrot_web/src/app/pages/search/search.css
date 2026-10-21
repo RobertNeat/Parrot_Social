@@ -1,0 +1,58 @@
+.search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 640px;
+}
+
+.search-status {
+  color: var(--text-on-panel-muted);
+}
+
+.search-section {
+  padding: 16px;
+}
+
+.search-section h3 {
+  margin: 0 0 10px;
+}
+
+.search-user-list,
+.search-post-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.search-user-list a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text-on-panel);
+}
+
+.search-user-list .username {
+  color: var(--text-on-panel-muted);
+  font-size: 0.85rem;
+}
+
+.search-post {
+  display: flex;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text-on-panel);
+}
+
+.search-post-body p {
+  margin: 4px 0 0;
+  color: var(--text-on-panel-muted);
+  font-size: 0.9rem;
+}
+
+.search-post-author {
+  font-weight: 700;
+}

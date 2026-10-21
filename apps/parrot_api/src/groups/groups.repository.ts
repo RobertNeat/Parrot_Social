@@ -118,4 +118,25 @@ export class GroupsRepository {
       [groupId, userId],
     );
   }
+
+  /** Inserts the group and enrolls the owner as its first member in a single statement - a CTE
+   * keeps both writes atomic without needing a separate transaction/client checkout. */
+  async create(input: {
+    name: string;
+    description: string;
+    ownerId: string;
+  }): Promise<string> {
+    const result = await this.pool.query<{ id: string }>(
+      `WITH g AS (
+         INSERT INTO groups (name, description, owner_id)
+         VALUES ($1, $2, $3)
+         RETURNING id
+       )
+       INSERT INTO group_member (group_id, user_id)
+       SELECT id, $3 FROM g
+       RETURNING group_id AS id`,
+      [input.name, input.description, input.ownerId],
+    );
+    return result.rows[0].id;
+  }
 }

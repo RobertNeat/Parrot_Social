@@ -37,6 +37,10 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/events/events').then((m) => m.Events),
       },
       {
+        path: 'search',
+        loadComponent: () => import('./pages/search/search').then((m) => m.Search),
+      },
+      {
         path: 'groups',
         loadComponent: () => import('./pages/groups-list/groups-list').then((m) => m.GroupsList),
       },

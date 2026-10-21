@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import type { GroupDto } from '@parrot-social/shared-dto';
+import type { CreateGroupRequestDto, GroupDto } from '@parrot-social/shared-dto';
 import { environment } from '../../../environments/environment';
 import { Group } from '../models/group.model';
 import { Post } from '../models/post.model';
@@ -62,6 +62,17 @@ export class GroupsService {
       }),
     );
     this.groupPosts.set(response.items.map(toLocalPost));
+  }
+
+  /** Returns true on success so the caller can clear/close its form. */
+  async createGroup(request: CreateGroupRequestDto): Promise<boolean> {
+    try {
+      const dto = await firstValueFrom(this.http.post<GroupDto>(this.baseUrl, request));
+      this.groups.update((groups) => [...groups, toLocalGroup(dto)]);
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   async toggleMembership(groupId: string): Promise<void> {

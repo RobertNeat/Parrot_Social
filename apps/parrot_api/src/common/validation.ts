@@ -69,3 +69,22 @@ export function optionalUuid(
   }
   return requireUuid(value, field);
 }
+
+/** Validates an ISO-8601 date-time string and returns it normalized (Date#toISOString) - callers
+ * store the normalized form so downstream formatting/sorting never sees the original, looser
+ * client-supplied string. */
+/** Escapes `\`, `%` and `_` for use inside an ILIKE pattern (with ESCAPE '\\') - without this, a
+ * search query containing those characters would be interpreted as wildcards/escapes instead of
+ * literal text. */
+export function escapeLikePattern(value: string): string {
+  return value.replace(/[\\%_]/g, (char) => `\\${char}`);
+}
+
+export function requireIsoDate(value: unknown, field: string): string {
+  const str = requireString(value, field);
+  const parsed = new Date(str);
+  if (Number.isNaN(parsed.getTime())) {
+    throw new BadRequestException(`${field} must be a valid date-time`);
+  }
+  return parsed.toISOString();
+}
