@@ -31,6 +31,9 @@ case "$PACKAGE_MANAGER" in
     # Resolve and build workspace dependencies from the package graph. The check
     # remains independent of application-specific package and dependency names.
     run_node pnpm --filter "${PACKAGE_NAME}..." --filter "!${PACKAGE_NAME}" run --if-present build
+    # Lint/typecheck/format-check each workspace dependency (e.g. shared-dto)
+    # with its own check script, so a library failure fails CI like an app's would.
+    run_node pnpm --filter "${PACKAGE_NAME}^..." run --if-present check
     ;;
   npm) (cd "$PROJECT_PATH" && run_node npm ci) ;;
   yarn) run_node yarn install --immutable ;;

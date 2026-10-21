@@ -1,3 +1,5 @@
+import { MediaRefDto } from '../media/media.dto.js';
+
 export class ChatMessageDto {
   id!: string;
   conversationId!: string;
@@ -5,12 +7,12 @@ export class ChatMessageDto {
   /** Viewer-relative: whether the requesting user is the sender. */
   fromMe!: boolean;
   text!: string;
-  imageUrl?: string;
+  image?: MediaRefDto;
   createdAt!: string;
 }
 
 export class SendMessageRequestDto {
   text!: string;
-  /** References a previously uploaded MediaDto.id. */
-  imageMediaId?: string;
+  /** MediaDto.attachHandle from a prior upload. */
+  imageAttachHandle?: string;
 }

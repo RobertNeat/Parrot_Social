@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/latest/dbchangelog.xsd">
+
+    <!-- Tabela medium (avatar/post/event/chat image) na przyszłość - plik na dysku
+         (docker volume) jest adresowany przez stored_file_name. `id` (PK) nigdy nie
+         jest zwracane klientowi - attach_handle jest jedynym identyfikatorem, który
+         klient poznaje (z odpowiedzi uploadu) i którym referencjonuje medium w request
+         DTO; media-access.store/service tłumaczy attach_handle na stored_file_name
+         wewnątrz backendu. owner_id bez FK - tabeli users jeszcze nie ma w tym changelogu. -->
+    <changeSet id="001-media-create-table" author="robert.sereda">
+        <createTable tableName="media">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="attach_handle" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="stored_file_name" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="original_file_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="mime_type" type="varchar(127)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="size" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="owner_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamptz" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

@@ -7,6 +7,8 @@
 
     <!-- Schemat aplikacji: dodawaj kolejne changesety/changelogi tutaj. -->
 
+    <include file="deploy/liquibase/changelog/001-media.xml" relativeToChangelogFile="false"/>
+
     <include file="deploy/liquibase/seed/changelog-seed.xml" relativeToChangelogFile="false" context="seed"/>
 
 </databaseChangeLog>

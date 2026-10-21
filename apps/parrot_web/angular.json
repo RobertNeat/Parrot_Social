@@ -55,6 +55,11 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "prebundle": {
+              "exclude": ["@parrot-social/shared-dto"]
+            }
+          },
           "configurations": {
             "production": {
               "buildTarget": "parrot_web:build:production"

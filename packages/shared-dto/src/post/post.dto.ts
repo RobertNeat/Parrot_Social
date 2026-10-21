@@ -1,15 +1,16 @@
 import { CommentDto } from './comment.dto.js';
+import { MediaRefDto } from '../media/media.dto.js';
 
 export class PostDto {
   id!: string;
   authorId!: string;
   authorUsername!: string;
   authorName!: string;
-  authorAvatarUrl?: string;
+  authorAvatar?: MediaRefDto;
   /** Set when the post belongs to a group feed rather than the main feed. */
   groupId?: string;
   text!: string;
-  imageUrl?: string;
+  image?: MediaRefDto;
   createdAt!: string;
   /** Viewer-relative: whether the requesting user liked/upvoted this post. */
   liked!: boolean;
@@ -21,8 +22,8 @@ export class PostDto {
 
 export class CreatePostRequestDto {
   text!: string;
-  /** References a previously uploaded MediaDto.id. */
-  imageMediaId?: string;
+  /** MediaDto.attachHandle from a prior upload. */
+  imageAttachHandle?: string;
   /** Set to post into a group feed instead of the author's main feed. */
   groupId?: string;
 }

@@ -7,8 +7,8 @@ export class UpdateProfileRequestDto {
   education?: string;
   provenance?: string;
   work?: string;
-  /** References a previously uploaded MediaDto.id; omit to leave the current avatar unchanged. */
-  avatarMediaId?: string;
-  /** References a previously uploaded MediaDto.id; omit to leave the current cover image unchanged. */
-  coverMediaId?: string;
+  /** MediaDto.attachHandle from a prior upload; omit to leave the current avatar unchanged. */
+  avatarAttachHandle?: string;
+  /** MediaDto.attachHandle from a prior upload; omit to leave the current cover image unchanged. */
+  coverAttachHandle?: string;
 }

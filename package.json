@@ -3,9 +3,13 @@
   "private": true,
   "packageManager": "pnpm@11.17.0",
   "scripts": {
-    "dev:frontend": "pnpm --filter @parrot-social/shared-dto build && pnpm --filter @parrot-social/parrot_web start",
-    "dev:backend": "pnpm --filter @parrot-social/shared-dto build && pnpm --filter @parrot-social/parrot_api start:dev",
+    "dev:frontend": "pnpm --filter \"@parrot-social/parrot_web^...\" run --if-present build && pnpm --filter \"@parrot-social/parrot_web...\" --parallel run --if-present dev",
+    "dev:backend": "pnpm --filter \"@parrot-social/parrot_api^...\" run --if-present build && pnpm --filter \"@parrot-social/parrot_api...\" --parallel run --if-present dev",
     "build": "pnpm -r build",
+    "build:frontend": "pnpm --filter \"@parrot-social/parrot_web^...\" run --if-present build && pnpm --filter @parrot-social/parrot_web run build",
+    "build:backend": "pnpm --filter \"@parrot-social/parrot_api^...\" run --if-present build && pnpm --filter @parrot-social/parrot_api run build",
+    "check": "pnpm -r build && pnpm -r --if-present run check",
     "test": "pnpm -r test"
-  }
+  },
+  "//": "dev:* scripts build workspace dependencies once up front so dist/ exists, then run the app's own 'dev' script (watch mode) together with every workspace dependency's 'dev' (watch) script in parallel, so editing shared-dto while the app is running rebuilds it automatically."
 }

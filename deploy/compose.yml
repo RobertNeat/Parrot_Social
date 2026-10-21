@@ -63,6 +63,7 @@ services:
       PORT: ${PARROT_API_CONTAINER_PORT:-10710}
       DATABASE_URL: postgresql://${PARROT_DB_USER:-parrot}:${PARROT_DB_PASSWORD:-parrot}@postgres:5432/${PARROT_DB_NAME:-parrot_social}
       PARROT_WEB_ORIGIN: ${PARROT_WEB_ORIGIN:-http://localhost:10700}
+      PARROT_API_PUBLIC_ORIGIN: ${PARROT_API_PUBLIC_ORIGIN:-http://localhost:10710}
     depends_on:
       liquibase:
         condition: service_completed_successfully

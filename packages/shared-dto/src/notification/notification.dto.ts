@@ -1,3 +1,5 @@
+import { MediaRefDto } from '../media/media.dto.js';
+
 export type NotificationType =
   | 'post-like'
   | 'post-upvote'
@@ -11,7 +13,7 @@ export class NotificationDto {
   type!: NotificationType;
   actorId!: string;
   actorName!: string;
-  actorAvatarUrl?: string;
+  actorAvatar?: MediaRefDto;
   /** Id of the post/event/group/user this notification refers to, when applicable. */
   targetId?: string;
   createdAt!: string;

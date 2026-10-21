@@ -1,8 +1,10 @@
+import { MediaRefDto } from '../media/media.dto.js';
+
 export class EventDto {
   id!: string;
   title!: string;
   description!: string;
-  imageUrl?: string;
+  image?: MediaRefDto;
   startsAt!: string;
   interestedCount!: number;
   /** Viewer-relative: whether the requesting user marked themself interested. */
@@ -13,6 +15,6 @@ export class CreateEventRequestDto {
   title!: string;
   description!: string;
   startsAt!: string;
-  /** References a previously uploaded MediaDto.id. */
-  imageMediaId?: string;
+  /** MediaDto.attachHandle from a prior upload. */
+  imageAttachHandle?: string;
 }

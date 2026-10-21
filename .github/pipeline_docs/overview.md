@@ -49,3 +49,30 @@ Runner i obrazy Docker korzystają z lokalnych rejestrów zamiast publicznych,
   pnpm 11.17.0);
 - zależności Maven — Reposilite, przez nginx na porcie 80 (aplikacja nasłuchuje
   tylko na `127.0.0.1:8080`), konfigurowany jako mirror w `.mvn/settings.xml`.
+
+## Lokalny development (poza CI)
+
+Root `package.json` udostępnia `dev:frontend`/`dev:backend` oraz
+`build:frontend`/`build:backend` — budują jednorazowo zależności workspace
+danej aplikacji (np. `packages/shared-dto`, filtr pnpm `"<nazwa-aplikacji>^..."`,
+bez nazywania konkretnego pakietu), a następnie uruchamiają *jednym* poleceniem
+(`pnpm --filter "<nazwa-aplikacji>..." --parallel run --if-present dev`) zarówno
+`dev` aplikacji (watch mode: `ng serve` / `nest start --watch`), jak i `dev`
+każdej jej zależności workspace (np. `packages/shared-dto` → `tsc -w`) —
+równolegle, w jednym procesie grupowym. Jednorazowy build na starcie jest
+potrzebny, bo świeży klon repo lub obraz Docker nie ma jeszcze katalogu
+`dist/` pakietu współdzielonego; od tego momentu edycja plików w
+`packages/shared-dto/src` przebudowuje `dist/` automatycznie, a dev server
+aplikacji podchwytuje zmianę bez ręcznego restartu — zweryfikowano
+empirycznie dla `apps/parrot_api` (edycja DTO wywołała rebuild `shared-dto`
+i automatyczny restart `nest --watch`). Dla `apps/parrot_web` dodatkowo
+wyłączono Vite-owe "prebundlowanie" pakietu `@parrot-social/shared-dto`
+(`serve.options.prebundle.exclude` w `angular.json`), bo inaczej Vite
+cache'uje raz zbudowany `dist/*.js` tego pakietu i nie obserwuje jego zmian.
+
+Niezweryfikowane: czy Ctrl+C w terminalu z `dev:frontend`/`dev:backend`
+czysto zatrzymuje całą grupę procesów (pnpm `--parallel` + oba `dev`
+skrypty) na Windows — podczas testowania procesy były zatrzymywane
+manualnie (`Stop-Process` po PID), nie przez Ctrl+C. Po zatrzymaniu
+dev session'u sprawdź `Get-NetTCPConnection -LocalPort <port>` i
+`Get-Process node,tsc`, czy nie zostały osierocone procesy.
