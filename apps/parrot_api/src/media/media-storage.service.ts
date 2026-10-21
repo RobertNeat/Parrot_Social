@@ -1,9 +1,28 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { randomUUID } from 'node:crypto';
 import type { Readable } from 'node:stream';
 import type { Pool } from 'pg';
+import type { MediaDto } from '@parrot-social/shared-dto';
 import { DATABASE_POOL } from '../database/database.tokens.js';
+
+// Keyed by mime type, not the client-supplied original filename's extension - the extension is
+// cosmetic only (readFile serves bytes with Content-Type from the DB column, never from the
+// filesystem extension), but a sane extension on disk is still useful for manual inspection.
+const EXTENSION_BY_MIME_TYPE: Record<string, string> = {
+  'image/png': '.png',
+  'image/jpeg': '.jpg',
+  'image/webp': '.webp',
+  'image/gif': '.gif',
+};
+
+const ORIGINAL_FILE_NAME_MAX_LENGTH = 255; // matches media.original_file_name varchar(255)
 
 export interface StoredMediaFile {
   storedFileName: string;
@@ -19,8 +38,8 @@ export interface StoredMediaMeta {
 }
 
 // Checked in order; first directory that actually contains the file wins. PARROT_MEDIA_DIR is the
-// real uploads volume (empty until an upload endpoint exists); PARROT_SEED_MEDIA_DIR is the
-// dev-only bind mount of deploy/liquibase/seed/media (see deploy/compose.dev.yml).
+// real uploads volume (written by saveUpload below); PARROT_SEED_MEDIA_DIR is the dev-only bind
+// mount of deploy/liquibase/seed/media (see deploy/compose.dev.yml).
 function candidateMediaDirs(): string[] {
   return [
     process.env.PARROT_MEDIA_DIR,
@@ -120,5 +139,66 @@ export class MediaStorageService {
     }
 
     throw new NotFoundException();
+  }
+
+  /** Persists an uploaded file to PARROT_MEDIA_DIR and records it in the `media` table. The
+   * stored_file_name is always a fresh random name, never the client-supplied original filename -
+   * that avoids both path-traversal (see readFile's defense-in-depth check above) and collisions. */
+  async saveUpload(
+    buffer: Buffer,
+    originalFileName: string,
+    mimeType: string,
+    ownerId: string,
+  ): Promise<MediaDto> {
+    const mediaDir = process.env.PARROT_MEDIA_DIR;
+    if (!mediaDir) {
+      throw new InternalServerErrorException(
+        'PARROT_MEDIA_DIR is not configured on this server',
+      );
+    }
+
+    const extension = EXTENSION_BY_MIME_TYPE[mimeType] ?? '';
+    const storedFileName = `${randomUUID()}${extension}`;
+    const truncatedOriginalFileName = originalFileName.slice(
+      0,
+      ORIGINAL_FILE_NAME_MAX_LENGTH,
+    );
+
+    await fs.promises.mkdir(mediaDir, { recursive: true });
+    const fullPath = path.join(mediaDir, storedFileName);
+    await fs.promises.writeFile(fullPath, buffer, { flag: 'wx' });
+
+    try {
+      const result = await this.pool.query<{
+        attach_handle: string;
+        original_file_name: string;
+        mime_type: string;
+        size: string;
+        created_at: Date;
+      }>(
+        `INSERT INTO media (stored_file_name, original_file_name, mime_type, size, owner_id)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING attach_handle, original_file_name, mime_type, size, created_at`,
+        [
+          storedFileName,
+          truncatedOriginalFileName,
+          mimeType,
+          buffer.length,
+          ownerId,
+        ],
+      );
+      const row = result.rows[0];
+      return {
+        attachHandle: row.attach_handle,
+        originalFileName: row.original_file_name,
+        mimeType: row.mime_type,
+        size: Number(row.size), // bigint column -> pg returns a string
+        createdAt: row.created_at.toISOString(),
+      };
+    } catch (error) {
+      // INSERT failed after the file already landed on disk - don't leave an orphaned file behind.
+      await fs.promises.unlink(fullPath).catch(() => {});
+      throw error;
+    }
   }
 }

@@ -26,20 +26,49 @@
   </div>
 
   <div class="images-col">
-    <div class="image-placeholder">
-      <span class="material-symbols-outlined">image</span>
-      <span>profile image</span>
+    <div class="image-placeholder" (click)="avatarInput.click()">
+      @if (avatarPreviewUrl()) {
+        <img class="preview-image" [src]="avatarPreviewUrl()" alt="profile image" />
+      } @else {
+        <span class="material-symbols-outlined">image</span>
+        <span>profile image</span>
+      }
+      @if (avatarUploading()) {
+        <span class="uploading-badge">uploading...</span>
+      }
     </div>
-    <div class="image-placeholder">
-      <span class="material-symbols-outlined">image</span>
-      <span>cover image</span>
+    <input
+      #avatarInput
+      type="file"
+      accept="image/*"
+      hidden
+      (change)="onFileSelected('avatar', $event)"
+    />
+
+    <div class="image-placeholder" (click)="coverInput.click()">
+      @if (coverPreviewUrl()) {
+        <img class="preview-image" [src]="coverPreviewUrl()" alt="cover image" />
+      } @else {
+        <span class="material-symbols-outlined">image</span>
+        <span>cover image</span>
+      }
+      @if (coverUploading()) {
+        <span class="uploading-badge">uploading...</span>
+      }
     </div>
+    <input
+      #coverInput
+      type="file"
+      accept="image/*"
+      hidden
+      (change)="onFileSelected('cover', $event)"
+    />
   </div>
 
   <div class="actions-row">
     @if (showSkip()) {
       <button type="button" class="btn btn-outline-gradient" (click)="skip.emit()">skip</button>
     }
-    <button type="submit" class="btn btn-primary">SAVE</button>
+    <button type="submit" class="btn btn-primary" [disabled]="isUploading">SAVE</button>
   </div>
 </form>

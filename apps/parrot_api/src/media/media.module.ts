@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MediaAccessController } from './media-access.controller.js';
 import { MediaStreamController } from './media-stream.controller.js';
+import { MediaUploadController } from './media-upload.controller.js';
 import { MediaAccessService } from './media-access.service.js';
 import { MediaRefBuilderService } from './media-ref-builder.service.js';
 import {
@@ -10,7 +11,11 @@ import {
 import { MediaStorageService } from './media-storage.service.js';
 
 @Module({
-  controllers: [MediaAccessController, MediaStreamController],
+  controllers: [
+    MediaAccessController,
+    MediaStreamController,
+    MediaUploadController,
+  ],
   providers: [
     MediaAccessService,
     MediaRefBuilderService,
