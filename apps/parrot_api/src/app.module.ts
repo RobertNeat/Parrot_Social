@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module.js';
 import { UsersModule } from './users/users.module.js';
 import { PostsModule } from './posts/posts.module.js';
 import { GroupsModule } from './groups/groups.module.js';
+import { EventsModule } from './events/events.module.js';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { GroupsModule } from './groups/groups.module.js';
     UsersModule,
     PostsModule,
     GroupsModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [

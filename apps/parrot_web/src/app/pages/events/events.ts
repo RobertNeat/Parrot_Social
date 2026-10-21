@@ -7,9 +7,11 @@ import { EventsService } from '../../core/services/events.service';
   styleUrl: './events.css',
 })
 export class Events {
-  constructor(readonly eventsService: EventsService) {}
+  constructor(readonly eventsService: EventsService) {
+    void this.eventsService.load();
+  }
 
-  toggle(eventId: string): void {
-    this.eventsService.toggleInterested(eventId);
+  async toggle(eventId: string): Promise<void> {
+    await this.eventsService.toggleInterested(eventId);
   }
 }
