@@ -4,7 +4,7 @@ import {
   RefreshMediaRefRequestDto,
   RefreshMediaRefResponseDto,
 } from '@parrot-social/shared-dto';
-import { JwtAuthGuard } from './jwt-auth.guard.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { MediaRefBuilderService } from './media-ref-builder.service.js';
 
 /** Refresh for a MediaRefDto that expired/404'd before the <img> request landed. Scoped to the
@@ -20,7 +20,7 @@ export class MediaAccessController {
     @Body() body: RefreshMediaRefRequestDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<RefreshMediaRefResponseDto> {
-    // TODO: once auth/storage are real, verify each attachHandle belongs to the caller before minting.
+    // TODO: verify each attachHandle belongs to the caller (media.owner_id) before minting.
     const refs: RefreshMediaRefResponseDto['refs'] = {};
     for (const attachHandle of body.attachHandles) {
       const ref = await this.mediaRefBuilder.buildRef(attachHandle, res);

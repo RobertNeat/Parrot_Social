@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import type { Response } from 'express';
 import type { MediaRefDto } from '@parrot-social/shared-dto';
 import { MediaAccessService } from './media-access.service.js';
+import { MediaStorageService } from './media-storage.service.js';
 
 const BINDING_COOKIE_TTL_MS = 60_000; // matches the token TTL in MediaAccessService
 
@@ -17,7 +18,10 @@ const USE_SECURE_COOKIE = API_PUBLIC_ORIGIN.startsWith('https://');
 /** Mints a MediaRefDto for `attachHandle` and attaches the matching per-token Set-Cookie header to `res`. */
 @Injectable()
 export class MediaRefBuilderService {
-  constructor(private readonly mediaAccessService: MediaAccessService) {}
+  constructor(
+    private readonly mediaAccessService: MediaAccessService,
+    private readonly mediaStorage: MediaStorageService,
+  ) {}
 
   async buildRef(
     attachHandle: string,
@@ -38,5 +42,17 @@ export class MediaRefBuilderService {
       url: `${API_PUBLIC_ORIGIN}/media/stream/${minted.token}`,
       expiresAt: minted.expiresAt.toISOString(),
     };
+  }
+
+  /** For columns that store a `media.id` (e.g. `users.avatar_media_id`) rather than an
+   * attachHandle — resolves the id server-side, never exposing it to the client. */
+  async buildRefForMediaId(
+    mediaId: string | null,
+    res: Response,
+  ): Promise<MediaRefDto | undefined> {
+    if (!mediaId) return undefined;
+    const attachHandle = await this.mediaStorage.findAttachHandleById(mediaId);
+    if (!attachHandle) return undefined;
+    return this.buildRef(attachHandle, res);
   }
 }

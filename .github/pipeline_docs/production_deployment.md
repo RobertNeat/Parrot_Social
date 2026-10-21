@@ -25,6 +25,11 @@ niego plik wskazany przez `deploy.config_file`. Przy kolejnych wdrożeniach
 istniejący zdalny `config.env` pozostaje bez zmian i jest używany przez Docker
 Compose.
 
+Zmienna `JWT_SECRET` jest wymagana przez `parrot-api` (`JWT_SECRET:?...` w
+`deploy/compose.yml` przerywa `docker compose up`, jeśli jej nie ma). Jeśli
+zdalny `config.env` już istnieje z wdrożenia sprzed dodania auth, trzeba do
+niego dopisać `JWT_SECRET` ręcznie przed kolejnym wdrożeniem.
+
 Adres hosta, użytkownik, rejestr, pliki i katalog zdalny są w sekcji `deploy`
 pliku [`../ci/projects.json`](../ci/projects.json). Wartości te (host, rejestr,
 katalog zdalny) zależą od docelowej infrastruktury i muszą zostać ustawione

@@ -11,8 +11,8 @@
          ich na nowo. avatar_media_id/cover_media_id pozostają NULL - avatary w mocku
          to statyczne assety frontendu (resources/person/*.png), nie realne pliki w
          wolumenie media; tworzenie fałszywych wierszy media pod nieistniejące pliki
-         byłoby mniej uczciwe niż zostawienie FK NULL. password_hash to placeholder -
-         konta seedowe nie są loginowalne, bo warstwa auth jeszcze nie istnieje. -->
+         byłoby mniej uczciwe niż zostawienie FK NULL. password_hash to placeholder,
+         nadpisywany realnym hashem w 008-seed-dev-passwords.xml. -->
     <changeSet id="seed-001-users" author="robert.sereda" context="seed">
         <insert tableName="users">
             <column name="id" value="00000000-0000-0000-0001-000000000001"/>

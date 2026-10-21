@@ -22,13 +22,13 @@ export class Login {
   readonly submitted = signal(false);
   readonly error = signal(false);
 
-  submit(): void {
+  async submit(): Promise<void> {
     this.submitted.set(true);
     if (this.form.invalid) {
       return;
     }
     const { identifier, password } = this.form.getRawValue();
-    const ok = this.auth.login(identifier ?? '', password ?? '');
+    const ok = await this.auth.login(identifier ?? '', password ?? '');
     this.error.set(!ok);
     if (ok) {
       this.router.navigateByUrl('/feed');

@@ -26,14 +26,16 @@ export class Register {
   );
 
   readonly submitted = signal(false);
+  readonly error = signal(false);
 
-  submit(): void {
+  async submit(): Promise<void> {
     this.submitted.set(true);
     if (this.form.invalid) {
       return;
     }
-    const { username, email } = this.form.getRawValue();
-    const ok = this.auth.register(username ?? '', email ?? '');
+    const { username, email, password } = this.form.getRawValue();
+    const ok = await this.auth.register(username ?? '', email ?? '', password ?? '');
+    this.error.set(!ok);
     if (ok) {
       this.router.navigateByUrl('/onboarding');
     }

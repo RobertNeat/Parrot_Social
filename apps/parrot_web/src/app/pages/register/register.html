@@ -25,6 +25,10 @@
       <span class="field-error">Passwords do not match.</span>
     }
 
+    @if (error()) {
+      <span class="field-error">Could not register. Username or email may already be taken.</span>
+    }
+
     <button type="submit" class="btn btn-outline-gradient register-btn">REGISTER</button>
 
     <p class="switch-link">

@@ -73,6 +73,7 @@ services:
       PARROT_WEB_ORIGIN: ${PARROT_WEB_ORIGIN:-http://localhost:10700}
       PARROT_API_PUBLIC_ORIGIN: ${PARROT_API_PUBLIC_ORIGIN:-http://localhost:10710}
       PARROT_MEDIA_DIR: /data/media
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required in config.env}
     volumes:
       - parrot-media:/data
     depends_on:

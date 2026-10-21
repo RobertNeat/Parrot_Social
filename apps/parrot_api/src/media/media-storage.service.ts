@@ -1,5 +1,7 @@
-import { Injectable, NotImplementedException } from '@nestjs/common';
+import { Inject, Injectable, NotImplementedException } from '@nestjs/common';
 import type { Readable } from 'node:stream';
+import type { Pool } from 'pg';
+import { DATABASE_POOL } from '../database/database.tokens.js';
 
 export interface StoredMediaFile {
   storedFileName: string;
@@ -14,17 +16,40 @@ export interface StoredMediaMeta {
   ownerId: string;
 }
 
-/** Stub for the eventual docker-volume-backed file storage layer. No DB/filesystem wiring yet. */
+/** Metadata lookups are wired to the `media` table; actual file bytes stay stubbed until the
+ * upload endpoint (and PARROT_MEDIA_DIR volume reads) exist. */
 @Injectable()
 export class MediaStorageService {
-  // TODO: back this with the `media` table (see deploy/liquibase changelog) once an ORM/DB client exists.
+  constructor(@Inject(DATABASE_POOL) private readonly pool: Pool) {}
+
   // attachHandle, not the DB id, is the lookup key — the id itself must never reach the client.
   async findMetaByAttachHandle(
-    _attachHandle: string,
+    attachHandle: string,
   ): Promise<StoredMediaMeta | undefined> {
-    throw new NotImplementedException(
-      'Media metadata lookup is not wired to a datastore yet.',
+    const result = await this.pool.query<{
+      stored_file_name: string;
+      mime_type: string;
+      owner_id: string;
+    }>(
+      'SELECT stored_file_name, mime_type, owner_id FROM media WHERE attach_handle = $1',
+      [attachHandle],
     );
+    const row = result.rows[0];
+    if (!row) return undefined;
+    return {
+      storedFileName: row.stored_file_name,
+      mimeType: row.mime_type,
+      ownerId: row.owner_id,
+    };
+  }
+
+  /** Resolves a `media.id` (as stored in e.g. `users.avatar_media_id`) to its attachHandle. */
+  async findAttachHandleById(mediaId: string): Promise<string | undefined> {
+    const result = await this.pool.query<{ attach_handle: string }>(
+      'SELECT attach_handle FROM media WHERE id = $1',
+      [mediaId],
+    );
+    return result.rows[0]?.attach_handle;
   }
 
   // TODO: read from PARROT_MEDIA_DIR (the docker volume mounted at /data, see deploy/compose.yml).
