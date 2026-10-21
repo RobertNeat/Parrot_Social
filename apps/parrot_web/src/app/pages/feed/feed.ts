@@ -43,6 +43,11 @@ export class Feed {
   constructor() {
     void this.feed.load();
     void this.contactsService.loadContacts().then((contacts) => this.contacts.set(contacts));
+    void this.chat.load().then(() => {
+      if (!this.activeConversationId()) {
+        this.activeConversationId.set(this.chat.conversations()[0]?.id ?? '');
+      }
+    });
     afterNextRender(() => {
       watchColumnCount(this.postsGrid(), this.columnCount, this.destroyRef, 280, 20);
     });
@@ -50,7 +55,7 @@ export class Feed {
 
   readonly contacts = signal<UserSummaryDto[]>([]);
   readonly newPostText = signal('');
-  readonly activeConversationId = signal(this.chat.conversations()[0]?.id ?? '');
+  readonly activeConversationId = signal('');
   readonly messageText = signal('');
 
   selectConversation(id: string): void {
@@ -72,13 +77,16 @@ export class Feed {
     }
   }
 
-  sendMessage(): void {
+  async sendMessage(): Promise<void> {
     const text = this.messageText().trim();
-    if (!text) {
+    const conversationId = this.activeConversationId();
+    if (!text || !conversationId) {
       return;
     }
-    this.chat.sendMessage(this.activeConversationId(), text);
-    this.messageText.set('');
+    const ok = await this.chat.sendMessage(conversationId, text);
+    if (ok) {
+      this.messageText.set('');
+    }
   }
 
   like(postId: string): void {

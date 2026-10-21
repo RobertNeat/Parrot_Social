@@ -10,6 +10,7 @@ import { UsersModule } from './users/users.module.js';
 import { PostsModule } from './posts/posts.module.js';
 import { GroupsModule } from './groups/groups.module.js';
 import { EventsModule } from './events/events.module.js';
+import { ChatModule } from './chat/chat.module.js';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { EventsModule } from './events/events.module.js';
     PostsModule,
     GroupsModule,
     EventsModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [

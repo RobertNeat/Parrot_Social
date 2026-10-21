@@ -11,8 +11,16 @@ import { ChatService } from '../../core/services/chat.service';
 export class Chat {
   readonly chat = inject(ChatService);
 
-  readonly activeConversationId = signal(this.chat.conversations()[0]?.id ?? '');
+  readonly activeConversationId = signal('');
   readonly messageText = signal('');
+
+  constructor() {
+    void this.chat.load().then(() => {
+      if (!this.activeConversationId()) {
+        this.activeConversationId.set(this.chat.conversations()[0]?.id ?? '');
+      }
+    });
+  }
 
   select(id: string): void {
     this.activeConversationId.set(id);
@@ -22,12 +30,15 @@ export class Chat {
     return this.chat.conversations().find((c) => c.id === this.activeConversationId());
   }
 
-  send(): void {
+  async send(): Promise<void> {
     const text = this.messageText().trim();
-    if (!text) {
+    const conversationId = this.activeConversationId();
+    if (!text || !conversationId) {
       return;
     }
-    this.chat.sendMessage(this.activeConversationId(), text);
-    this.messageText.set('');
+    const ok = await this.chat.sendMessage(conversationId, text);
+    if (ok) {
+      this.messageText.set('');
+    }
   }
 }
