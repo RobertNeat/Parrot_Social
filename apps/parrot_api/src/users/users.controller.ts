@@ -14,6 +14,11 @@ import type {
 } from '@parrot-social/shared-dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { MediaStorageService } from '../media/media-storage.service.js';
+import {
+  optionalNullableString,
+  optionalString,
+  optionalUuid,
+} from '../common/validation.js';
 import { toCurrentUserDto } from './user.mapper.js';
 import { UsersRepository } from './users.repository.js';
 import { MediaRefBuilderService } from '../media/media-ref-builder.service.js';
@@ -35,30 +40,57 @@ export class UsersController {
   ): Promise<CurrentUserDto> {
     const userId = (req as Request & { user: { id: string } }).user.id;
 
-    let avatarMediaId: string | undefined;
-    if (body.avatarAttachHandle !== undefined) {
-      avatarMediaId = await this.resolveOwnedMediaId(
-        body.avatarAttachHandle,
-        userId,
-      );
-    }
-    let coverMediaId: string | undefined;
-    if (body.coverAttachHandle !== undefined) {
-      coverMediaId = await this.resolveOwnedMediaId(
-        body.coverAttachHandle,
-        userId,
-      );
-    }
+    const firstName = optionalString(body.firstName, 'firstName', {
+      maxLength: 100,
+    });
+    const lastName = optionalString(body.lastName, 'lastName', {
+      maxLength: 100,
+    });
+    const bio = optionalNullableString(body.bio, 'bio');
+    const work = optionalNullableString(body.work, 'work', { maxLength: 255 });
+    const education = optionalNullableString(body.education, 'education', {
+      maxLength: 255,
+    });
+    const relationship = optionalNullableString(
+      body.relationship,
+      'relationship',
+      { maxLength: 100 },
+    );
+    const inhabitance = optionalNullableString(
+      body.inhabitance,
+      'inhabitance',
+      { maxLength: 255 },
+    );
+    const provenance = optionalNullableString(body.provenance, 'provenance', {
+      maxLength: 255,
+    });
+    const avatarAttachHandle = optionalUuid(
+      body.avatarAttachHandle,
+      'avatarAttachHandle',
+    );
+    const coverAttachHandle = optionalUuid(
+      body.coverAttachHandle,
+      'coverAttachHandle',
+    );
+
+    const avatarMediaId =
+      avatarAttachHandle !== undefined
+        ? await this.resolveOwnedMediaId(avatarAttachHandle, userId)
+        : undefined;
+    const coverMediaId =
+      coverAttachHandle !== undefined
+        ? await this.resolveOwnedMediaId(coverAttachHandle, userId)
+        : undefined;
 
     const row = await this.usersRepository.update(userId, {
-      firstName: body.firstName,
-      lastName: body.lastName,
-      bio: body.bio,
-      work: body.work,
-      education: body.education,
-      relationship: body.relationship,
-      inhabitance: body.inhabitance,
-      provenance: body.provenance,
+      firstName,
+      lastName,
+      bio,
+      work,
+      education,
+      relationship,
+      inhabitance,
+      provenance,
       avatarMediaId,
       coverMediaId,
     });

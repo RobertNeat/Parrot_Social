@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   UnauthorizedException,
@@ -14,9 +15,11 @@ import type {
 import { UsersRepository } from '../users/users.repository.js';
 import { toCurrentUserDto } from '../users/user.mapper.js';
 import { MediaRefBuilderService } from '../media/media-ref-builder.service.js';
+import { requireString } from '../common/validation.js';
 import { hashPassword, verifyPassword } from './password.util.js';
 
 const ACCESS_TOKEN_TTL_SECONDS = 60 * 60; // 1h
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 @Injectable()
 export class AuthService {
@@ -27,8 +30,10 @@ export class AuthService {
   ) {}
 
   async login(dto: LoginRequestDto, res: Response): Promise<AuthResponseDto> {
-    const row = await this.usersRepository.findByIdentifier(dto.identifier);
-    if (!row || !(await verifyPassword(dto.password, row.password_hash))) {
+    const identifier = requireString(dto.identifier, 'identifier');
+    const password = requireString(dto.password, 'password');
+    const row = await this.usersRepository.findByIdentifier(identifier);
+    if (!row || !(await verifyPassword(password, row.password_hash))) {
       throw new UnauthorizedException('Invalid credentials');
     }
     return this.buildAuthResponse(row, res);
@@ -38,19 +43,31 @@ export class AuthService {
     dto: RegisterRequestDto,
     res: Response,
   ): Promise<AuthResponseDto> {
+    const username = requireString(dto.username, 'username', {
+      minLength: 1,
+      maxLength: 64,
+    });
+    const email = requireString(dto.email, 'email', { maxLength: 255 });
+    if (!EMAIL_RE.test(email)) {
+      throw new BadRequestException('email must be a valid email address');
+    }
+    const password = requireString(dto.password, 'password', {
+      minLength: 6,
+    });
+
     const taken = await this.usersRepository.usernameOrEmailTaken(
-      dto.username,
-      dto.email,
+      username,
+      email,
     );
     if (taken) {
       throw new ConflictException('Username or email already in use');
     }
-    const passwordHash = await hashPassword(dto.password);
+    const passwordHash = await hashPassword(password);
     const row = await this.usersRepository.create({
-      username: dto.username,
-      email: dto.email,
+      username,
+      email,
       passwordHash,
-      firstName: dto.username,
+      firstName: username,
       lastName: '',
     });
     return this.buildAuthResponse(row, res);

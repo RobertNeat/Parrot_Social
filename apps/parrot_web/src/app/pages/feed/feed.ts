@@ -38,6 +38,7 @@ export class Feed {
   );
 
   constructor() {
+    void this.feed.load();
     afterNextRender(() => {
       watchColumnCount(this.postsGrid(), this.columnCount, this.destroyRef, 280, 20);
     });
@@ -56,17 +57,15 @@ export class Feed {
     return this.chat.conversations().find((c) => c.id === this.activeConversationId());
   }
 
-  share(): void {
+  async share(): Promise<void> {
     const text = this.newPostText().trim();
     if (!text) {
       return;
     }
-    const user = this.auth.currentUser();
-    if (!user) {
-      return;
+    const ok = await this.feed.addPost(text);
+    if (ok) {
+      this.newPostText.set('');
     }
-    this.feed.addPost(text, `${user.firstName} ${user.lastName}`, user.avatarUrl, user.id);
-    this.newPostText.set('');
   }
 
   sendMessage(): void {
@@ -79,27 +78,18 @@ export class Feed {
   }
 
   like(postId: string): void {
-    this.feed.toggleLike(postId);
+    void this.feed.toggleLike(postId);
   }
 
   upvote(postId: string): void {
-    this.feed.toggleUpvote(postId);
+    void this.feed.toggleUpvote(postId);
   }
 
   comment(event: { postId: string; text: string }): void {
-    const user = this.auth.currentUser();
-    if (!user) {
-      return;
-    }
-    this.feed.addComment(
-      event.postId,
-      event.text,
-      `${user.firstName} ${user.lastName}`,
-      user.avatarUrl,
-    );
+    void this.feed.addComment(event.postId, event.text);
   }
 
   remove(postId: string): void {
-    this.feed.deletePost(postId);
+    void this.feed.deletePost(postId);
   }
 }

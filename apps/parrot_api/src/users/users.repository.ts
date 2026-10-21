@@ -82,12 +82,12 @@ export class UsersRepository {
     patch: {
       firstName?: string;
       lastName?: string;
-      bio?: string;
-      work?: string;
-      education?: string;
-      relationship?: string;
-      inhabitance?: string;
-      provenance?: string;
+      bio?: string | null;
+      work?: string | null;
+      education?: string | null;
+      relationship?: string | null;
+      inhabitance?: string | null;
+      provenance?: string | null;
       avatarMediaId?: string | null;
       coverMediaId?: string | null;
     },

@@ -8,7 +8,6 @@ Liquibase), `@nestjs/jwt` + Node `crypto.scrypt` (hashowanie haseł).
 Po każdym kroku: `pnpm run check` (lint/typecheck/prettier/testy), pauza,
 czekam na dalsze dyspozycje użytkownika.
 
-- [ ] 3. Feed (lista stron, create/like/upvote/comment/delete)
 - [ ] 4. Profile (publiczny profil po id)
 - [ ] 5. Groups (lista + strona grupy, join/leave)
 - [ ] 6. Events (lista, interested toggle)
