@@ -103,16 +103,18 @@
       </nav>
 
       <ul class="friend-list">
-        @for (friend of friends; track friend.id) {
+        @for (friend of friends(); track friend.id) {
           <li>
-            <img
-              class="avatar"
-              [src]="friend.avatarUrl"
-              [alt]="friend.firstName"
-              width="36"
-              height="36"
-            />
-            <span>{{ friend.firstName }} {{ friend.lastName }}</span>
+            <a [routerLink]="['/profile', friend.id]" (click)="closeMobileNav()">
+              <img
+                class="avatar"
+                [src]="friend.avatarUrl"
+                [alt]="friend.firstName"
+                width="36"
+                height="36"
+              />
+              <span>{{ friend.firstName }} {{ friend.lastName }}</span>
+            </a>
           </li>
         }
       </ul>

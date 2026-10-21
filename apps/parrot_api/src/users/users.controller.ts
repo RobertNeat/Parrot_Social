@@ -2,6 +2,9 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
+  NotFoundException,
+  Param,
   Patch,
   Req,
   Res,
@@ -11,6 +14,8 @@ import type { Request, Response } from 'express';
 import type {
   CurrentUserDto,
   UpdateProfileRequestDto,
+  UserProfileDto,
+  UserSummaryDto,
 } from '@parrot-social/shared-dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { MediaStorageService } from '../media/media-storage.service.js';
@@ -18,8 +23,13 @@ import {
   optionalNullableString,
   optionalString,
   optionalUuid,
+  requireUuid,
 } from '../common/validation.js';
-import { toCurrentUserDto } from './user.mapper.js';
+import {
+  toCurrentUserDto,
+  toUserProfileDto,
+  toUserSummaryDto,
+} from './user.mapper.js';
 import { UsersRepository } from './users.repository.js';
 import { MediaRefBuilderService } from '../media/media-ref-builder.service.js';
 
@@ -30,6 +40,48 @@ export class UsersController {
     private readonly mediaStorage: MediaStorageService,
     private readonly mediaRefBuilder: MediaRefBuilderService,
   ) {}
+
+  // Literal routes (me/friends, me/contacts) must be declared above the parameterized :id
+  // route below, or Nest matches "me" as :id first.
+  @UseGuards(JwtAuthGuard)
+  @Get('me/friends')
+  async getMyFriends(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<UserSummaryDto[]> {
+    const userId = (req as Request & { user: { id: string } }).user.id;
+    const rows = await this.usersRepository.findAcceptedFriends(userId);
+    return Promise.all(
+      rows.map((row) => toUserSummaryDto(row, this.mediaRefBuilder, res)),
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me/contacts')
+  async getMyContacts(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<UserSummaryDto[]> {
+    const userId = (req as Request & { user: { id: string } }).user.id;
+    const rows = await this.usersRepository.findContacts(userId);
+    return Promise.all(
+      rows.map((row) => toUserSummaryDto(row, this.mediaRefBuilder, res)),
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  async getById(
+    @Param('id') idRaw: string,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<UserProfileDto> {
+    const id = requireUuid(idRaw, 'id');
+    const row = await this.usersRepository.findById(id);
+    if (!row) {
+      throw new NotFoundException('User not found');
+    }
+    return toUserProfileDto(row, this.mediaRefBuilder, res);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Patch('me')

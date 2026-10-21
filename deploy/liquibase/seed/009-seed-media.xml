@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Realne pliki PNG w deploy/liquibase/seed/media/ (zob. deploy/compose.dev.yml -
+         bind mount do /seed-media w parrot-api, PARROT_SEED_MEDIA_DIR). Nadpisuje
+         wcześniejszą decyzję z 001-seed-users.xml/003-seed-posts.xml ("avatar_media_id/
+         image_media_id zostają NULL, bo plik nie istnieje w wolumenie") - te pliki
+         teraz istnieją, więc dopinamy media + avatar/image FK w kolejnych changesetach
+         tego pliku. Segment UUID 0010 - 0001..0009 już zajęte przez wcześniejsze pliki
+         seed (users, posts, groups, events, chat, notifications, comments,
+         post_like/upvote nie mają PK uuid, friendship). size = realny rozmiar pliku na
+         dysku (stat), nie wartość orientacyjna. -->
+    <changeSet id="seed-009-media" author="robert.sereda" context="seed">
+        <!-- Avatary - mapowanie na użytkowników niżej (seed-009-avatars). men_5..men_9 są
+             kopiami men_1..men_4/men_1 na dysku (ten sam rozmiar), ale to odrębne wiersze
+             media, bo każdy CONTACTS user ma mieć własny, nie powielony avatar_media_id. -->
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000001"/>
+            <column name="stored_file_name" value="men_1.png"/>
+            <column name="original_file_name" value="men_1.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="119828"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000001"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000002"/>
+            <column name="stored_file_name" value="men_2.png"/>
+            <column name="original_file_name" value="men_2.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="891750"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000002"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000003"/>
+            <column name="stored_file_name" value="men_3.png"/>
+            <column name="original_file_name" value="men_3.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="133508"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000003"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000004"/>
+            <column name="stored_file_name" value="men_4.png"/>
+            <column name="original_file_name" value="men_4.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="1071074"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000004"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000005"/>
+            <column name="stored_file_name" value="women_1.png"/>
+            <column name="original_file_name" value="women_1.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="580496"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000005"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000006"/>
+            <column name="stored_file_name" value="men_6.png"/>
+            <column name="original_file_name" value="men_6.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="891750"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000006"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000010"/>
+            <column name="stored_file_name" value="men_5.png"/>
+            <column name="original_file_name" value="men_5.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="119828"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000010"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000007"/>
+            <column name="stored_file_name" value="men_7.png"/>
+            <column name="original_file_name" value="men_7.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="133508"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000007"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000008"/>
+            <column name="stored_file_name" value="men_8.png"/>
+            <column name="original_file_name" value="men_8.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="1071074"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000008"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000009"/>
+            <column name="stored_file_name" value="men_9.png"/>
+            <column name="original_file_name" value="men_9.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="119828"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000009"/>
+        </insert>
+        <!-- Obrazki postów - mapowanie na posty niżej (seed-009-post-images). owner_id to
+             autor posta, nie "uploader" w innym sensie - zgodne z findOwnedIdByAttachHandle. -->
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000011"/>
+            <column name="stored_file_name" value="post_image_1.png"/>
+            <column name="original_file_name" value="post_image_1.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="335379"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000001"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000012"/>
+            <column name="stored_file_name" value="post_image_2.png"/>
+            <column name="original_file_name" value="post_image_2.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="307329"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000001"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000013"/>
+            <column name="stored_file_name" value="post_image_3.png"/>
+            <column name="original_file_name" value="post_image_3.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="335379"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000002"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000014"/>
+            <column name="stored_file_name" value="post_image_4.png"/>
+            <column name="original_file_name" value="post_image_4.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="307329"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000004"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000015"/>
+            <column name="stored_file_name" value="post_image_5.png"/>
+            <column name="original_file_name" value="post_image_5.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="335379"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000003"/>
+        </insert>
+    </changeSet>
+
+    <!-- Avatary: john.davis=men_1, jamal.pearson=men_2, solomon.rhodes=men_3,
+         john.strong=men_4, nevaeh.arias=women_1 - dokładnie to, co te konta "miały"
+         koncepcyjnie w mocku frontendu. CONTACTS (marvin/tomas/allan/zakaria/seamus)
+         w mocku odwzorowywały się na men_1..men_4 - te pliki są już zajęte przez
+         powyższych userów, więc CONTACTS dostają po jednej z nowych kopii
+         men_5..men_9 (bez powtórzeń), żeby każdy miał odrębny avatar_media_id. -->
+    <changeSet id="seed-009-avatars" author="robert.sereda" context="seed">
+        <update tableName="users">
+            <column name="avatar_media_id" value="00000000-0000-0000-0010-000000000001"/>
+            <where>id = '00000000-0000-0000-0001-000000000001'</where>
+        </update>
+        <update tableName="users">
+            <column name="avatar_media_id" value="00000000-0000-0000-0010-000000000002"/>
+            <where>id = '00000000-0000-0000-0001-000000000002'</where>
+        </update>
+        <update tableName="users">
+            <column name="avatar_media_id" value="00000000-0000-0000-0010-000000000003"/>
+            <where>id = '00000000-0000-0000-0001-000000000003'</where>
+        </update>
+        <update tableName="users">
+            <column name="avatar_media_id" value="00000000-0000-0000-0010-000000000004"/>
+            <where>id = '00000000-0000-0000-0001-000000000004'</where>
+        </update>
+        <update tableName="users">
+            <column name="avatar_media_id" value="00000000-0000-0000-0010-000000000005"/>
+            <where>id = '00000000-0000-0000-0001-000000000005'</where>
+        </update>
+        <!-- marvin.barlow -->
+        <update tableName="users">
+            <column name="avatar_media_id" value="00000000-0000-0000-0010-000000000006"/>
+            <where>id = '00000000-0000-0000-0001-000000000006'</where>
+        </update>
+        <!-- tomas.gutierrez -->
+        <update tableName="users">
+            <column name="avatar_media_id" value="00000000-0000-0000-0010-000000000007"/>
+            <where>id = '00000000-0000-0000-0001-000000000007'</where>
+        </update>
+        <!-- allan.bullock -->
+        <update tableName="users">
+            <column name="avatar_media_id" value="00000000-0000-0000-0010-000000000008"/>
+            <where>id = '00000000-0000-0000-0001-000000000008'</where>
+        </update>
+        <!-- zakaria.mccoy -->
+        <update tableName="users">
+            <column name="avatar_media_id" value="00000000-0000-0000-0010-000000000009"/>
+            <where>id = '00000000-0000-0000-0001-000000000009'</where>
+        </update>
+        <!-- seamus.ross - men_5 jest piątą z nowych kopii (men_5..men_9), żeby
+             wszystkich 5 CONTACTS dostało odrębny plik bez powtórzeń. -->
+        <update tableName="users">
+            <column name="avatar_media_id" value="00000000-0000-0000-0010-000000000010"/>
+            <where>id = '00000000-0000-0000-0001-000000000010'</where>
+        </update>
+    </changeSet>
+
+    <!-- Obrazki postów z mocka: INITIAL_POSTS p1/p2 (post_image_1/post_image_2),
+         GROUP_POSTS gp1 (post_image_1 w mocku, ale żeby zachować różnorodność plików
+         przypisujemy odrębny post_image_3), gp2 (post_image_2 w mocku -> post_image_4
+         dla różnorodności), gp4 (post_image_1 w mocku -> post_image_5 dla
+         różnorodności). gp3 nie ma obrazka w mocku - pomijamy. Każdy z 5 postów z
+         obrazkiem dostaje jeden z 5 dostępnych plików, bez powtórzeń. -->
+    <changeSet id="seed-009-post-images" author="robert.sereda" context="seed">
+        <!-- p1 -->
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000011"/>
+            <where>id = '00000000-0000-0000-0002-000000000001'</where>
+        </update>
+        <!-- p2 -->
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000012"/>
+            <where>id = '00000000-0000-0000-0002-000000000002'</where>
+        </update>
+        <!-- gp1 -->
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000013"/>
+            <where>id = '00000000-0000-0000-0002-000000000003'</where>
+        </update>
+        <!-- gp2 (Golden hour in the city) -->
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000014"/>
+            <where>id = '00000000-0000-0000-0002-000000000004'</where>
+        </update>
+        <!-- gp4 (Our next meetup is Saturday morning) -->
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000015"/>
+            <where>id = '00000000-0000-0000-0002-000000000006'</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

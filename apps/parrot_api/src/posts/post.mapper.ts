@@ -1,7 +1,12 @@
 import type { Response } from 'express';
-import type { CommentDto, PostDto } from '@parrot-social/shared-dto';
+import type {
+  CommentDto,
+  PagedResponseDto,
+  PostDto,
+} from '@parrot-social/shared-dto';
 import { MediaRefBuilderService } from '../media/media-ref-builder.service.js';
 import type { CommentRow, PostRow } from './posts.repository.js';
+import type { PostsRepository } from './posts.repository.js';
 
 export async function toPostDto(
   row: PostRow,
@@ -30,6 +35,33 @@ export async function toPostDto(
       comments.map((comment) => toCommentDto(comment, mediaRefBuilder, res)),
     ),
   };
+}
+
+/** Shared "rows -> load comments -> toPostDto -> PagedResponseDto" shape used by the main feed,
+ * by-author and by-group listings alike, so each controller method doesn't repeat it. */
+export async function toPagedPostsDto(
+  postsRepository: PostsRepository,
+  rows: PostRow[],
+  totalCount: number,
+  page: number,
+  pageSize: number,
+  mediaRefBuilder: MediaRefBuilderService,
+  res: Response,
+): Promise<PagedResponseDto<PostDto>> {
+  const comments = await postsRepository.findCommentsByPostIds(
+    rows.map((row) => row.id),
+  );
+  const items = await Promise.all(
+    rows.map((row) =>
+      toPostDto(
+        row,
+        comments.filter((comment) => comment.post_id === row.id),
+        mediaRefBuilder,
+        res,
+      ),
+    ),
+  );
+  return { items, page, pageSize, totalCount };
 }
 
 export async function toCommentDto(

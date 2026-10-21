@@ -52,6 +52,17 @@ describe('authInterceptor', () => {
     http.get('/posts').subscribe();
     const req = httpMock.expectOne('/posts');
     expect(req.request.headers.get('Authorization')).toBe('Bearer token-abc');
+    expect(req.request.withCredentials).toBe(true);
+    req.flush({});
+  });
+
+  // Regression for media images never rendering: without withCredentials the browser drops
+  // the Set-Cookie the media-ref flow relies on, even on requests that have no bearer token.
+  it('sets withCredentials even without a stored token', () => {
+    AuthTokenStore.clear();
+    http.get('/posts').subscribe();
+    const req = httpMock.expectOne('/posts');
+    expect(req.request.withCredentials).toBe(true);
     req.flush({});
   });
 

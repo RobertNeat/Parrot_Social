@@ -1,38 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import type { CommentDto, PagedResponseDto, PostDto } from '@parrot-social/shared-dto';
+import type { PagedResponseDto, PostDto } from '@parrot-social/shared-dto';
 import { environment } from '../../../environments/environment';
-import { Comment, Post } from '../models/post.model';
-
-const FALLBACK_AVATAR = 'resources/person/men_1.png';
-
-/** Maps the real API shape to the local Post/Comment models still used by PostCard, shared with
- * group-page and profile pages that aren't wired to the backend yet. */
-function toLocalPost(dto: PostDto): Post {
-  return {
-    id: dto.id,
-    authorId: dto.authorId,
-    authorName: dto.authorName,
-    authorAvatarUrl: dto.authorAvatar?.url ?? FALLBACK_AVATAR,
-    imageUrl: dto.image?.url,
-    text: dto.text,
-    liked: dto.liked,
-    likeCount: dto.likeCount,
-    upvoted: dto.upvoted,
-    upvoteCount: dto.upvoteCount,
-    comments: dto.comments.map(toLocalComment),
-  };
-}
-
-function toLocalComment(dto: CommentDto): Comment {
-  return {
-    id: dto.id,
-    authorName: dto.authorName,
-    authorAvatarUrl: dto.authorAvatar?.url ?? FALLBACK_AVATAR,
-    text: dto.text,
-  };
-}
+import { Post } from '../models/post.model';
+import { toLocalPost } from './post.mapper';
 
 @Injectable({ providedIn: 'root' })
 export class FeedService {
@@ -56,53 +28,58 @@ export class FeedService {
     }
   }
 
-  async addPost(text: string): Promise<boolean> {
+  async addPost(text: string, groupId?: string): Promise<Post | null> {
     try {
-      const dto = await firstValueFrom(this.http.post<PostDto>(this.baseUrl, { text }));
-      this.posts.update((posts) => [toLocalPost(dto), ...posts]);
+      const dto = await firstValueFrom(this.http.post<PostDto>(this.baseUrl, { text, groupId }));
+      const post = toLocalPost(dto);
+      if (!groupId) {
+        this.posts.update((posts) => [post, ...posts]);
+      }
+      return post;
+    } catch {
+      return null;
+    }
+  }
+
+  /** Caller passes the post's CURRENT liked state (since this post may not live in
+   * `this.posts()` - e.g. shown on a profile/group page) and applies the returned Post to its
+   * own list itself. */
+  async toggleLike(postId: string, currentlyLiked: boolean): Promise<Post> {
+    const dto = currentlyLiked
+      ? await firstValueFrom(this.http.delete<PostDto>(`${this.baseUrl}/${postId}/like`))
+      : await firstValueFrom(this.http.post<PostDto>(`${this.baseUrl}/${postId}/like`, {}));
+    return toLocalPost(dto);
+  }
+
+  async toggleUpvote(postId: string, currentlyUpvoted: boolean): Promise<Post> {
+    const dto = currentlyUpvoted
+      ? await firstValueFrom(this.http.delete<PostDto>(`${this.baseUrl}/${postId}/upvote`))
+      : await firstValueFrom(this.http.post<PostDto>(`${this.baseUrl}/${postId}/upvote`, {}));
+    return toLocalPost(dto);
+  }
+
+  /** Returns the updated Post (backend returns the full post, not just the new comment) so
+   * callers can apply it to their own local list rather than reloading the wrong feed. */
+  async addComment(postId: string, text: string): Promise<Post | null> {
+    const trimmed = text.trim();
+    if (!trimmed) {
+      return null;
+    }
+    const dto = await firstValueFrom(
+      this.http.post<PostDto>(`${this.baseUrl}/${postId}/comments`, {
+        text: trimmed,
+      }),
+    );
+    return toLocalPost(dto);
+  }
+
+  async deletePost(postId: string): Promise<boolean> {
+    try {
+      await firstValueFrom(this.http.delete(`${this.baseUrl}/${postId}`));
+      this.posts.update((posts) => posts.filter((post) => post.id !== postId));
       return true;
     } catch {
       return false;
     }
-  }
-
-  async toggleLike(postId: string): Promise<void> {
-    const post = this.posts().find((p) => p.id === postId);
-    if (!post) return;
-    const dto = post.liked
-      ? await firstValueFrom(this.http.delete<PostDto>(`${this.baseUrl}/${postId}/like`))
-      : await firstValueFrom(this.http.post<PostDto>(`${this.baseUrl}/${postId}/like`, {}));
-    this.replacePost(toLocalPost(dto));
-  }
-
-  async toggleUpvote(postId: string): Promise<void> {
-    const post = this.posts().find((p) => p.id === postId);
-    if (!post) return;
-    const dto = post.upvoted
-      ? await firstValueFrom(this.http.delete<PostDto>(`${this.baseUrl}/${postId}/upvote`))
-      : await firstValueFrom(this.http.post<PostDto>(`${this.baseUrl}/${postId}/upvote`, {}));
-    this.replacePost(toLocalPost(dto));
-  }
-
-  async addComment(postId: string, text: string): Promise<void> {
-    const trimmed = text.trim();
-    if (!trimmed) {
-      return;
-    }
-    await firstValueFrom(
-      this.http.post<CommentDto>(`${this.baseUrl}/${postId}/comments`, {
-        text: trimmed,
-      }),
-    );
-    await this.load();
-  }
-
-  async deletePost(postId: string): Promise<void> {
-    await firstValueFrom(this.http.delete(`${this.baseUrl}/${postId}`));
-    this.posts.update((posts) => posts.filter((post) => post.id !== postId));
-  }
-
-  private replacePost(post: Post): void {
-    this.posts.update((posts) => posts.map((p) => (p.id === post.id ? post : p)));
   }
 }

@@ -1,4 +1,6 @@
-import { Inject, Injectable, NotImplementedException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import type { Readable } from 'node:stream';
 import type { Pool } from 'pg';
 import { DATABASE_POOL } from '../database/database.tokens.js';
@@ -16,8 +18,17 @@ export interface StoredMediaMeta {
   ownerId: string;
 }
 
-/** Metadata lookups are wired to the `media` table; actual file bytes stay stubbed until the
- * upload endpoint (and PARROT_MEDIA_DIR volume reads) exist. */
+// Checked in order; first directory that actually contains the file wins. PARROT_MEDIA_DIR is the
+// real uploads volume (empty until an upload endpoint exists); PARROT_SEED_MEDIA_DIR is the
+// dev-only bind mount of deploy/liquibase/seed/media (see deploy/compose.dev.yml).
+function candidateMediaDirs(): string[] {
+  return [
+    process.env.PARROT_MEDIA_DIR,
+    process.env.PARROT_SEED_MEDIA_DIR,
+  ].filter((dir): dir is string => !!dir);
+}
+
+/** Metadata lookups and real file bytes are both wired to the `media` table / media volumes. */
 @Injectable()
 export class MediaStorageService {
   constructor(@Inject(DATABASE_POOL) private readonly pool: Pool) {}
@@ -65,8 +76,49 @@ export class MediaStorageService {
     return result.rows[0]?.id;
   }
 
-  // TODO: read from PARROT_MEDIA_DIR (the docker volume mounted at /data, see deploy/compose.yml).
-  async readFile(_storedFileName: string): Promise<StoredMediaFile> {
-    throw new NotImplementedException('Media file storage is not wired yet.');
+  /** Looks up `mime_type` by `stored_file_name` - readFile only gets the stored name (not the
+   * attachHandle), so it needs its own narrow query rather than reusing findMetaByAttachHandle. */
+  private async findMimeTypeByStoredFileName(
+    storedFileName: string,
+  ): Promise<string | undefined> {
+    const result = await this.pool.query<{ mime_type: string }>(
+      'SELECT mime_type FROM media WHERE stored_file_name = $1',
+      [storedFileName],
+    );
+    return result.rows[0]?.mime_type;
+  }
+
+  async readFile(storedFileName: string): Promise<StoredMediaFile> {
+    // Defense in depth: stored_file_name comes straight out of the DB column, but it must never
+    // be trusted as a filesystem path - reject anything that isn't a plain basename.
+    if (
+      !storedFileName ||
+      storedFileName.includes('/') ||
+      storedFileName.includes('\\') ||
+      storedFileName.includes('..') ||
+      path.basename(storedFileName) !== storedFileName
+    ) {
+      throw new NotFoundException();
+    }
+
+    const mimeType = await this.findMimeTypeByStoredFileName(storedFileName);
+    if (!mimeType) throw new NotFoundException();
+
+    for (const dir of candidateMediaDirs()) {
+      const fullPath = path.join(dir, storedFileName);
+      try {
+        const stats = await fs.promises.stat(fullPath);
+        if (!stats.isFile()) continue;
+        return {
+          storedFileName,
+          mimeType,
+          stream: fs.createReadStream(fullPath),
+        };
+      } catch {
+        // Not found in this directory - try the next candidate.
+      }
+    }
+
+    throw new NotFoundException();
   }
 }

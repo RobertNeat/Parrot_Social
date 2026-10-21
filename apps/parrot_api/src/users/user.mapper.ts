@@ -1,5 +1,9 @@
 import type { Response } from 'express';
-import type { CurrentUserDto, UserProfileDto } from '@parrot-social/shared-dto';
+import type {
+  CurrentUserDto,
+  UserProfileDto,
+  UserSummaryDto,
+} from '@parrot-social/shared-dto';
 import { MediaRefBuilderService } from '../media/media-ref-builder.service.js';
 import type { UserRow } from './users.repository.js';
 
@@ -31,6 +35,21 @@ export function toUserProfileDto(
   res: Response,
 ): Promise<UserProfileDto> {
   return buildProfileFields(row, mediaRefBuilder, res);
+}
+
+/** Minimal denormalized profile fields for author/contact/member display lists. */
+export async function toUserSummaryDto(
+  row: UserRow,
+  mediaRefBuilder: MediaRefBuilderService,
+  res: Response,
+): Promise<UserSummaryDto> {
+  return {
+    id: row.id,
+    username: row.username,
+    firstName: row.first_name,
+    lastName: row.last_name,
+    avatar: await mediaRefBuilder.buildRefForMediaId(row.avatar_media_id, res),
+  };
 }
 
 export async function toCurrentUserDto(

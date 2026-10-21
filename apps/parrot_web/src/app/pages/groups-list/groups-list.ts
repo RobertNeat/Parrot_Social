@@ -9,11 +9,13 @@ import { GroupsService } from '../../core/services/groups.service';
   styleUrl: './groups-list.css',
 })
 export class GroupsList {
-  constructor(readonly groupsService: GroupsService) {}
+  constructor(readonly groupsService: GroupsService) {
+    void this.groupsService.loadGroups();
+  }
 
   toggle(groupId: string, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
-    this.groupsService.toggleMembership(groupId);
+    void this.groupsService.toggleMembership(groupId);
   }
 }

@@ -4,6 +4,7 @@ import {
   ElementRef,
   afterNextRender,
   computed,
+  effect,
   inject,
   signal,
   viewChild,
@@ -12,6 +13,9 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { GroupsService } from '../../core/services/groups.service';
+import { FeedService } from '../../core/services/feed.service';
+import { Group } from '../../core/models/group.model';
+import { Post } from '../../core/models/post.model';
 import { PostCard } from '../../shared/components/post-card/post-card';
 import {
   distributeRoundRobin,
@@ -26,15 +30,26 @@ import {
 })
 export class GroupPage {
   readonly groupsService = inject(GroupsService);
+  private readonly feed = inject(FeedService);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly postsGrid = viewChild.required<ElementRef<HTMLElement>>('postsGrid');
   private readonly columnCount = signal(1);
 
+  readonly group = signal<Group | undefined>(undefined);
+  private loadingId: string | null = null;
+
   constructor() {
     afterNextRender(() => {
       watchColumnCount(this.postsGrid(), this.columnCount, this.destroyRef, 260, 20);
+    });
+
+    // Angular reuses this component instance across /groups/x -> /groups/y navigations, so
+    // reload whenever the route id changes rather than once at construction time.
+    effect(() => {
+      const id = this.groupId();
+      void this.doLoad(id);
     });
   }
 
@@ -45,63 +60,52 @@ export class GroupPage {
     },
   );
 
-  readonly group = computed(() => this.groupsService.getGroup(this.groupId()));
   readonly postColumns = computed(() =>
     distributeRoundRobin(this.groupsService.groupPosts(), this.columnCount()),
   );
 
+  private async doLoad(id: string): Promise<void> {
+    if (!id || id === this.loadingId) return;
+    this.loadingId = id;
+    this.groupsService.groupPosts.set([]);
+    const group = await this.groupsService.loadGroup(id);
+    if (this.loadingId !== id) return; // stale response - a newer navigation already started
+    this.group.set(group ?? undefined);
+    if (group) {
+      await this.groupsService.loadGroupPosts(id);
+    }
+  }
+
   toggleMembership(): void {
     const group = this.group();
     if (group) {
-      this.groupsService.toggleMembership(group.id);
+      void this.groupsService.toggleMembership(group.id).then(() => {
+        this.group.set(this.groupsService.getGroup(group.id));
+      });
     }
   }
 
   like(postId: string): void {
-    this.groupsService.groupPosts.update((posts) =>
-      posts.map((post) =>
-        post.id === postId
-          ? { ...post, liked: !post.liked, likeCount: post.likeCount + (post.liked ? -1 : 1) }
-          : post,
-      ),
-    );
+    const post = this.groupsService.groupPosts().find((p) => p.id === postId);
+    if (!post) return;
+    void this.feed.toggleLike(postId, post.liked).then((updated) => this.applyPost(updated));
   }
 
   upvote(postId: string): void {
-    this.groupsService.groupPosts.update((posts) =>
-      posts.map((post) =>
-        post.id === postId
-          ? {
-              ...post,
-              upvoted: !post.upvoted,
-              upvoteCount: post.upvoteCount + (post.upvoted ? -1 : 1),
-            }
-          : post,
-      ),
-    );
+    const post = this.groupsService.groupPosts().find((p) => p.id === postId);
+    if (!post) return;
+    void this.feed.toggleUpvote(postId, post.upvoted).then((updated) => this.applyPost(updated));
   }
 
   comment(event: { postId: string; text: string }): void {
-    if (!event.text.trim()) {
-      return;
-    }
+    void this.feed.addComment(event.postId, event.text).then((updated) => {
+      if (updated) this.applyPost(updated);
+    });
+  }
+
+  private applyPost(post: Post): void {
     this.groupsService.groupPosts.update((posts) =>
-      posts.map((post) =>
-        post.id === event.postId
-          ? {
-              ...post,
-              comments: [
-                ...post.comments,
-                {
-                  id: 'c-' + crypto.randomUUID(),
-                  authorName: 'You',
-                  authorAvatarUrl: '',
-                  text: event.text,
-                },
-              ],
-            }
-          : post,
-      ),
+      posts.map((p) => (p.id === post.id ? post : p)),
     );
   }
 }

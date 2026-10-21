@@ -99,6 +99,76 @@ export class PostsRepository {
     return result.rows[0];
   }
 
+  /** All posts by `authorId` (main-feed AND group posts both) - a user's profile shows their
+   * full post history, unlike the main feed which only shows group_id IS NULL posts. */
+  async findByAuthor(
+    authorId: string,
+    viewerId: string,
+    page: number,
+    pageSize: number,
+  ): Promise<{ rows: PostRow[]; totalCount: number }> {
+    const clampedPageSize = Math.min(
+      Math.max(1, pageSize || PAGE_SIZE_DEFAULT),
+      PAGE_SIZE_MAX,
+    );
+    const clampedPage = Math.max(1, page || 1);
+    const offset = (clampedPage - 1) * clampedPageSize;
+
+    const [rowsResult, countResult] = await Promise.all([
+      this.pool.query<PostRow>(
+        `${POST_SELECT}
+         WHERE p.author_id = $2
+         ORDER BY p.created_at DESC, p.id DESC
+         LIMIT $3 OFFSET $4`,
+        [viewerId, authorId, clampedPageSize, offset],
+      ),
+      this.pool.query<{ count: number }>(
+        'SELECT count(*)::int AS count FROM post WHERE author_id = $1',
+        [authorId],
+      ),
+    ]);
+
+    return { rows: rowsResult.rows, totalCount: countResult.rows[0].count };
+  }
+
+  async findByGroup(
+    groupId: string,
+    viewerId: string,
+    page: number,
+    pageSize: number,
+  ): Promise<{ rows: PostRow[]; totalCount: number }> {
+    const clampedPageSize = Math.min(
+      Math.max(1, pageSize || PAGE_SIZE_DEFAULT),
+      PAGE_SIZE_MAX,
+    );
+    const clampedPage = Math.max(1, page || 1);
+    const offset = (clampedPage - 1) * clampedPageSize;
+
+    const [rowsResult, countResult] = await Promise.all([
+      this.pool.query<PostRow>(
+        `${POST_SELECT}
+         WHERE p.group_id = $2
+         ORDER BY p.created_at DESC, p.id DESC
+         LIMIT $3 OFFSET $4`,
+        [viewerId, groupId, clampedPageSize, offset],
+      ),
+      this.pool.query<{ count: number }>(
+        'SELECT count(*)::int AS count FROM post WHERE group_id = $1',
+        [groupId],
+      ),
+    ]);
+
+    return { rows: rowsResult.rows, totalCount: countResult.rows[0].count };
+  }
+
+  async isGroupMember(groupId: string, userId: string): Promise<boolean> {
+    const result = await this.pool.query(
+      'SELECT 1 FROM group_member WHERE group_id = $1 AND user_id = $2',
+      [groupId, userId],
+    );
+    return result.rows.length > 0;
+  }
+
   async findCommentsByPostIds(postIds: string[]): Promise<CommentRow[]> {
     if (postIds.length === 0) return [];
     const result = await this.pool.query<CommentRow>(
@@ -122,12 +192,18 @@ export class PostsRepository {
     authorId: string;
     text: string;
     imageMediaId?: string;
+    groupId?: string;
   }): Promise<string> {
     const result = await this.pool.query<{ id: string }>(
-      `INSERT INTO post (author_id, text, image_media_id)
-       VALUES ($1, $2, $3)
+      `INSERT INTO post (author_id, text, image_media_id, group_id)
+       VALUES ($1, $2, $3, $4)
        RETURNING id`,
-      [input.authorId, input.text, input.imageMediaId ?? null],
+      [
+        input.authorId,
+        input.text,
+        input.imageMediaId ?? null,
+        input.groupId ?? null,
+      ],
     );
     return result.rows[0].id;
   }

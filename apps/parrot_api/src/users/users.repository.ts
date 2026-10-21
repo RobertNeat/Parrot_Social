@@ -42,6 +42,39 @@ export class UsersRepository {
     return result.rows[0];
   }
 
+  /** Other party of every ACCEPTED friendship involving `userId`, regardless of who was the
+   * requester/addressee. */
+  async findAcceptedFriends(userId: string): Promise<UserRow[]> {
+    const result = await this.pool.query<UserRow>(
+      `SELECT u.*
+       FROM friendship f
+       JOIN users u ON u.id = CASE
+         WHEN f.requester_id = $1 THEN f.addressee_id
+         ELSE f.requester_id
+       END
+       WHERE f.status = 'accepted' AND $1 IN (f.requester_id, f.addressee_id)
+       ORDER BY u.first_name, u.last_name`,
+      [userId],
+    );
+    return result.rows;
+  }
+
+  /** Distinct set of OTHER participants across every conversation `userId` is part of. */
+  async findContacts(userId: string): Promise<UserRow[]> {
+    const result = await this.pool.query<UserRow>(
+      `SELECT DISTINCT u.*
+       FROM conversation_participant other
+       JOIN users u ON u.id = other.user_id
+       WHERE other.user_id != $1
+         AND other.conversation_id IN (
+           SELECT conversation_id FROM conversation_participant WHERE user_id = $1
+         )
+       ORDER BY u.first_name, u.last_name`,
+      [userId],
+    );
+    return result.rows;
+  }
+
   async usernameOrEmailTaken(
     username: string,
     email: string,

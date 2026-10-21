@@ -8,9 +8,17 @@ import { MediaModule } from './media/media.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { UsersModule } from './users/users.module.js';
 import { PostsModule } from './posts/posts.module.js';
+import { GroupsModule } from './groups/groups.module.js';
 
 @Module({
-  imports: [DatabaseModule, MediaModule, AuthModule, UsersModule, PostsModule],
+  imports: [
+    DatabaseModule,
+    MediaModule,
+    AuthModule,
+    UsersModule,
+    PostsModule,
+    GroupsModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,

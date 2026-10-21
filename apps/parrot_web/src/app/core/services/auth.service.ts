@@ -9,35 +9,7 @@ import type {
 import { environment } from '../../../environments/environment';
 import { UserProfile } from '../models/user.model';
 import { AuthTokenStore } from './auth-token.store';
-
-const FALLBACK_AVATAR = 'resources/person/men_1.png';
-
-/** Maps the real session DTO to the local UserProfile shape still used by pages/mock-data that
- * aren't wired to the backend yet (Feed, Profile, Settings/Onboarding forms). Each page switches
- * to CurrentUserDto directly once its own slice lands; until then this keeps them compiling and
- * rendering against a real logged-in user instead of the old CURRENT_USER mock constant. */
-function toLocalProfile(dto: CurrentUserDto): UserProfile {
-  return {
-    id: dto.id,
-    username: dto.username,
-    email: dto.email,
-    firstName: dto.firstName,
-    lastName: dto.lastName,
-    avatarUrl: dto.avatar?.url ?? FALLBACK_AVATAR,
-    coverUrl: dto.cover?.url ?? FALLBACK_AVATAR,
-    bio: dto.bio ?? '',
-    work: dto.work,
-    education: dto.education,
-    relationship: dto.relationship,
-    inhabitance: dto.inhabitance,
-    provenance: dto.provenance,
-    memberSince: new Date(dto.createdAt).toLocaleDateString('en-GB', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    }),
-  };
-}
+import { toLocalProfile } from './user.mapper';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {

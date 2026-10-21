@@ -17,5 +17,6 @@
     <include file="006-seed-notifications.xml" relativeToChangelogFile="true" context="seed"/>
     <include file="007-seed-friendship.xml" relativeToChangelogFile="true" context="seed"/>
     <include file="008-seed-dev-passwords.xml" relativeToChangelogFile="true" context="seed"/>
+    <include file="009-seed-media.xml" relativeToChangelogFile="true" context="seed"/>
 
 </databaseChangeLog>

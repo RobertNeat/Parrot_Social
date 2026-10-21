@@ -18,9 +18,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   // lookup until the catchError callback runs avoids the cycle.
   const injector = inject(Injector);
 
+  // withCredentials: parrot-web and parrot-api are different origins; without this, the
+  // browser silently drops the Set-Cookie header the media-ref flow relies on (and never
+  // sends it back), so every media image 404s regardless of the Authorization header.
   const authorizedReq = token
-    ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
-    : req;
+    ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` }, withCredentials: true })
+    : req.clone({ withCredentials: true });
 
   return next(authorizedReq).pipe(
     catchError((error: unknown) => {

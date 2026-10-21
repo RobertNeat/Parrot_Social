@@ -7,5 +7,6 @@ import { PostsRepository } from './posts.repository.js';
   imports: [MediaModule],
   controllers: [PostsController],
   providers: [PostsRepository],
+  exports: [PostsRepository],
 })
 export class PostsModule {}

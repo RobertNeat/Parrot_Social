@@ -14,7 +14,6 @@ import {
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import type {
-  CommentDto,
   CreateCommentRequestDto,
   CreatePostRequestDto,
   PagedResponseDto,
@@ -28,7 +27,7 @@ import {
   requireString,
   requireUuid,
 } from '../common/validation.js';
-import { toCommentDto, toPostDto } from './post.mapper.js';
+import { toPagedPostsDto, toPostDto } from './post.mapper.js';
 import { PostsRepository } from './posts.repository.js';
 
 @Controller('posts')
@@ -56,21 +55,46 @@ export class PostsController {
       page,
       pageSize,
     );
-    const comments = await this.postsRepository.findCommentsByPostIds(
-      rows.map((row) => row.id),
+    return toPagedPostsDto(
+      this.postsRepository,
+      rows,
+      totalCount,
+      page,
+      pageSize,
+      this.mediaRefBuilder,
+      res,
     );
-    const items = await Promise.all(
-      rows.map((row) =>
-        toPostDto(
-          row,
-          comments.filter((comment) => comment.post_id === row.id),
-          this.mediaRefBuilder,
-          res,
-        ),
-      ),
-    );
+  }
 
-    return { items, page, pageSize, totalCount };
+  /** A user's profile shows ALL their posts (main-feed AND group posts both). */
+  @Get('by-author/:userId')
+  async listByAuthor(
+    @Param('userId') authorIdRaw: string,
+    @Query('page') pageRaw: string | undefined,
+    @Query('pageSize') pageSizeRaw: string | undefined,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<PagedResponseDto<PostDto>> {
+    const authorId = requireUuid(authorIdRaw, 'userId');
+    const viewerId = userId(req);
+    const page = parsePositiveInt(pageRaw, 1);
+    const pageSize = parsePositiveInt(pageSizeRaw, 20);
+
+    const { rows, totalCount } = await this.postsRepository.findByAuthor(
+      authorId,
+      viewerId,
+      page,
+      pageSize,
+    );
+    return toPagedPostsDto(
+      this.postsRepository,
+      rows,
+      totalCount,
+      page,
+      pageSize,
+      this.mediaRefBuilder,
+      res,
+    );
   }
 
   @Post()
@@ -88,11 +112,17 @@ export class PostsController {
       body.imageAttachHandle,
       'imageAttachHandle',
     );
-    // groupId posting isn't supported until the Groups slice - never accept it unchecked.
-    if (body.groupId !== undefined) {
-      throw new BadRequestException(
-        'Posting into a group is not supported yet',
+    const groupId = optionalUuid(body.groupId, 'groupId');
+    if (groupId !== undefined) {
+      const isMember = await this.postsRepository.isGroupMember(
+        groupId,
+        authorId,
       );
+      if (!isMember) {
+        throw new BadRequestException(
+          'Only members of a group may post into it',
+        );
+      }
     }
 
     const imageMediaId = imageAttachHandle
@@ -103,6 +133,7 @@ export class PostsController {
       authorId,
       text,
       imageMediaId,
+      groupId,
     });
     return this.loadPostDto(postId, authorId, res);
   }
@@ -173,13 +204,16 @@ export class PostsController {
     return this.loadPostDto(id, viewerId, res);
   }
 
+  // Returns the updated PostDto (not just the new CommentDto) - like the like/upvote
+  // endpoints, so callers can apply the full updated post to their own local list instead of
+  // reloading an entire (possibly unrelated) feed/profile/group post list.
   @Post(':id/comments')
   async addComment(
     @Param('id') idRaw: string,
     @Body() body: CreateCommentRequestDto,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<CommentDto> {
+  ): Promise<PostDto> {
     const id = requireUuid(idRaw, 'id');
     const authorId = userId(req);
     const text = requireString(body.text, 'text', {
@@ -187,17 +221,12 @@ export class PostsController {
       maxLength: 2000,
     });
     await this.ensureExists(id);
-    const commentId = await this.postsRepository.addComment({
+    await this.postsRepository.addComment({
       postId: id,
       authorId,
       text,
     });
-    const comments = await this.postsRepository.findCommentsByPostIds([id]);
-    const created = comments.find((row) => row.id === commentId);
-    if (!created) {
-      throw new NotFoundException('Comment not found after creation');
-    }
-    return toCommentDto(created, this.mediaRefBuilder, res);
+    return this.loadPostDto(id, authorId, res);
   }
 
   private async ensureExists(postId: string): Promise<void> {

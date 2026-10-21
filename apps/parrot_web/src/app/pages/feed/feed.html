@@ -40,11 +40,11 @@
 
   <aside class="side-panel panel">
     <ul class="contact-list">
-      @for (contact of contacts; track contact.id) {
+      @for (contact of contacts(); track contact.id) {
         <li>
           <img
             class="avatar"
-            [src]="contact.avatarUrl"
+            [src]="contact.avatar?.url ?? 'resources/person/men_1.png'"
             [alt]="contact.firstName"
             width="32"
             height="32"
