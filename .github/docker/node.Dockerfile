@@ -16,6 +16,7 @@ ENV npm_config_store_dir=/pnpm/store
 COPY .npmrc pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/parrot_api/package.json ./apps/parrot_api/package.json
 COPY apps/parrot_web/package.json ./apps/parrot_web/package.json
+COPY packages/shared-dto/package.json ./packages/shared-dto/package.json
 # Registry (.npmrc) and fetch-timeout/fetch-retries (pnpm-workspace.yaml) come from
 # the committed config files. --config.fetch-timeout as a CLI override crashes on
 # pnpm 11.17.0: the string value reaches AbortSignal.timeout() unconverted, throwing

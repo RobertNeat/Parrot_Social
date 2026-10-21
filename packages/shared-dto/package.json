@@ -1,0 +1,33 @@
+{
+  "name": "@parrot-social/shared-dto",
+  "version": "0.0.1",
+  "description": "Shared DTO classes used to transport data between parrot_api and parrot_web.",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "oxlint --type-aware src/",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\"",
+    "check": "pnpm run lint && pnpm run typecheck && pnpm run format:check",
+    "test": "echo \"no tests in shared-dto\""
+  },
+  "devDependencies": {
+    "oxlint": "^1.58.0",
+    "prettier": "^3.4.2",
+    "typescript": "^6.0.2"
+  }
+}
