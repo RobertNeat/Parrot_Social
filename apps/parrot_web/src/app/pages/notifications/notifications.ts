@@ -7,5 +7,7 @@ import { NotificationsService } from '../../core/services/notifications.service'
   styleUrl: './notifications.css',
 })
 export class Notifications {
-  constructor(readonly notifications: NotificationsService) {}
+  constructor(readonly notifications: NotificationsService) {
+    void this.notifications.load();
+  }
 }

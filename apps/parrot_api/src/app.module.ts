@@ -11,6 +11,7 @@ import { PostsModule } from './posts/posts.module.js';
 import { GroupsModule } from './groups/groups.module.js';
 import { EventsModule } from './events/events.module.js';
 import { ChatModule } from './chat/chat.module.js';
+import { NotificationsModule } from './notifications/notifications.module.js';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ChatModule } from './chat/chat.module.js';
     GroupsModule,
     EventsModule,
     ChatModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [

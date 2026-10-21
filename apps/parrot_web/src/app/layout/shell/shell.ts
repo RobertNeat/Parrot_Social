@@ -24,6 +24,9 @@ export class Shell {
     private readonly router: Router,
   ) {
     void this.profileService.loadFriends().then((friends) => this.friends.set(friends));
+    // Eager-load so the unread badge (shell.html) is correct immediately on login, not only
+    // after the user visits /notifications.
+    void this.notifications.load();
   }
 
   toggleMobileNav(): void {
