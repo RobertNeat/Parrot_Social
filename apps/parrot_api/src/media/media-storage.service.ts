@@ -52,6 +52,19 @@ export class MediaStorageService {
     return result.rows[0]?.attach_handle;
   }
 
+  /** Resolves an attachHandle to its `media.id`, scoped to `ownerId` - prevents setting e.g. an
+   * avatar to media uploaded by a different user. */
+  async findOwnedIdByAttachHandle(
+    attachHandle: string,
+    ownerId: string,
+  ): Promise<string | undefined> {
+    const result = await this.pool.query<{ id: string }>(
+      'SELECT id FROM media WHERE attach_handle = $1 AND owner_id = $2',
+      [attachHandle, ownerId],
+    );
+    return result.rows[0]?.id;
+  }
+
   // TODO: read from PARROT_MEDIA_DIR (the docker volume mounted at /data, see deploy/compose.yml).
   async readFile(_storedFileName: string): Promise<StoredMediaFile> {
     throw new NotImplementedException('Media file storage is not wired yet.');

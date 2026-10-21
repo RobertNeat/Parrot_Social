@@ -18,8 +18,8 @@ export class Onboarding {
     private readonly router: Router,
   ) {}
 
-  save(value: PersonalInfoValue): void {
-    this.auth.updateProfile(value);
+  async save(value: PersonalInfoValue): Promise<void> {
+    await this.auth.updateProfile(value);
     this.router.navigateByUrl('/feed');
   }
 

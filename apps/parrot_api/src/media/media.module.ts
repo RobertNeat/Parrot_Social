@@ -17,6 +17,6 @@ import { MediaStorageService } from './media-storage.service.js';
     MediaStorageService,
     { provide: MediaAccessStore, useClass: InMemoryMediaAccessStore },
   ],
-  exports: [MediaRefBuilderService],
+  exports: [MediaRefBuilderService, MediaStorageService],
 })
 export class MediaModule {}

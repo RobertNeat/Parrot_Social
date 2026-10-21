@@ -13,11 +13,13 @@ import {
 })
 export class Settings {
   readonly saved = signal(false);
+  readonly error = signal(false);
 
   constructor(readonly auth: AuthService) {}
 
-  save(value: PersonalInfoValue): void {
-    this.auth.updateProfile(value);
-    this.saved.set(true);
+  async save(value: PersonalInfoValue): Promise<void> {
+    const ok = await this.auth.updateProfile(value);
+    this.saved.set(ok);
+    this.error.set(!ok);
   }
 }

@@ -3,5 +3,8 @@
   @if (saved()) {
     <p class="saved-msg">Your profile has been updated.</p>
   }
+  @if (error()) {
+    <p class="field-error">Could not update your profile. Please try again.</p>
+  }
   <app-personal-info-form [user]="auth.currentUser()" [showSkip]="false" (save)="save($event)" />
 </div>

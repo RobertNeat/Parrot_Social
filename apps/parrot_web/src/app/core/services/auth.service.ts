@@ -1,7 +1,11 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import type { AuthResponseDto, CurrentUserDto } from '@parrot-social/shared-dto';
+import type {
+  AuthResponseDto,
+  CurrentUserDto,
+  UpdateProfileRequestDto,
+} from '@parrot-social/shared-dto';
 import { environment } from '../../../environments/environment';
 import { UserProfile } from '../models/user.model';
 import { AuthTokenStore } from './auth-token.store';
@@ -101,10 +105,16 @@ export class AuthService {
     }
   }
 
-  /** Local-only until the PATCH /users/me endpoint exists (Settings/Onboarding slice). */
-  updateProfile(partial: Partial<UserProfile>): void {
-    const updated = { ...this.user(), ...partial } as UserProfile;
-    this.user.set(updated);
+  async updateProfile(patch: UpdateProfileRequestDto): Promise<boolean> {
+    try {
+      const dto = await firstValueFrom(
+        this.http.patch<CurrentUserDto>(`${environment.apiUrl}/users/me`, patch),
+      );
+      this.user.set(toLocalProfile(dto));
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   logout(): void {

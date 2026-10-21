@@ -74,4 +74,50 @@ export class UsersRepository {
     );
     return result.rows[0];
   }
+
+  /** Only fields present in `patch` are updated - `undefined` means "leave unchanged", distinct
+   * from an explicit empty string. Media id columns accept `null` to clear them. */
+  async update(
+    id: string,
+    patch: {
+      firstName?: string;
+      lastName?: string;
+      bio?: string;
+      work?: string;
+      education?: string;
+      relationship?: string;
+      inhabitance?: string;
+      provenance?: string;
+      avatarMediaId?: string | null;
+      coverMediaId?: string | null;
+    },
+  ): Promise<UserRow> {
+    const columns: Record<string, unknown> = {
+      first_name: patch.firstName,
+      last_name: patch.lastName,
+      bio: patch.bio,
+      work: patch.work,
+      education: patch.education,
+      relationship: patch.relationship,
+      inhabitance: patch.inhabitance,
+      provenance: patch.provenance,
+      avatar_media_id: patch.avatarMediaId,
+      cover_media_id: patch.coverMediaId,
+    };
+    const entries = Object.entries(columns).filter(
+      ([, value]) => value !== undefined,
+    );
+    if (entries.length === 0) {
+      return (await this.findById(id))!;
+    }
+    const setClause = entries
+      .map(([column], index) => `${column} = $${index + 2}`)
+      .join(', ');
+    const values = entries.map(([, value]) => value);
+    const result = await this.pool.query<UserRow>(
+      `UPDATE users SET ${setClause} WHERE id = $1 RETURNING *`,
+      [id, ...values],
+    );
+    return result.rows[0];
+  }
 }
