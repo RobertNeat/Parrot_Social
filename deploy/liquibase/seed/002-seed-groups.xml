@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Grupy z mock-data.ts (GROUPS). Uwaga: mock g1.members zawiera nazwy, które nie
+         odpowiadają żadnemu seedowanemu użytkownikowi (Tom Scott, Miley Marcus, Patty
+         Weddy) - pomijamy je, nie tworzymy fikcyjnych kont tylko żeby zgodzić liczbę
+         członków. Mock ma też niespójność: CURRENT_USER (John Davis) ma joined:true dla
+         g1, ale nie występuje w liście members - dodajemy go jako członka, żeby
+         group_member odzwierciedlało joined=true z punktu widzenia CURRENT_USER.
+         Członkostwo g1 obejmuje też Solomon Rhodes i Nevaeh Arias, mimo że nie są
+         wymienieni w mock GROUPS[0].members - są autorami GROUP_POSTS przypisanych
+         do tej grupy (gp3, gp4), a autor posta grupowego musi być jej członkiem. -->
+    <changeSet id="seed-002-groups" author="robert.sereda" context="seed">
+        <insert tableName="groups">
+            <column name="id" value="00000000-0000-0000-0003-000000000001"/>
+            <column name="name" value="Photography Lovers"/>
+            <column name="description" value="Long group description giving the group existence and pointing to what they are exsisting."/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000002"/>
+            <column name="created_at" valueComputed="now()"/>
+        </insert>
+        <insert tableName="groups">
+            <column name="id" value="00000000-0000-0000-0003-000000000002"/>
+            <column name="name" value="Weekend Hikers"/>
+            <column name="description" value="For anyone who loves getting outdoors on the weekend - trail reports, meetups and gear talk."/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000003"/>
+            <column name="created_at" valueComputed="now()"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-002-group-members" author="robert.sereda" context="seed">
+        <!-- g1 Photography Lovers: owner Jamal, + John Strong (realny user z mocka),
+             + John Davis (CURRENT_USER, joined:true w mocku), + Solomon Rhodes i
+             Nevaeh Arias (autorzy postów grupowych gp3/gp4 - zob. komentarz wyżej). -->
+        <insert tableName="group_member">
+            <column name="group_id" value="00000000-0000-0000-0003-000000000001"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000002"/>
+        </insert>
+        <insert tableName="group_member">
+            <column name="group_id" value="00000000-0000-0000-0003-000000000001"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000004"/>
+        </insert>
+        <insert tableName="group_member">
+            <column name="group_id" value="00000000-0000-0000-0003-000000000001"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000001"/>
+        </insert>
+        <insert tableName="group_member">
+            <column name="group_id" value="00000000-0000-0000-0003-000000000001"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000003"/>
+        </insert>
+        <insert tableName="group_member">
+            <column name="group_id" value="00000000-0000-0000-0003-000000000001"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000005"/>
+        </insert>
+        <!-- g2 Weekend Hikers: owner Solomon, John Strong, Nevaeh Arias - CURRENT_USER
+             joined:false, więc nie dodajemy John Davis. -->
+        <insert tableName="group_member">
+            <column name="group_id" value="00000000-0000-0000-0003-000000000002"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000003"/>
+        </insert>
+        <insert tableName="group_member">
+            <column name="group_id" value="00000000-0000-0000-0003-000000000002"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000004"/>
+        </insert>
+        <insert tableName="group_member">
+            <column name="group_id" value="00000000-0000-0000-0003-000000000002"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000005"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

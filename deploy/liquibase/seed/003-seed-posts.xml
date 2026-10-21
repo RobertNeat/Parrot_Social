@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Posty z mock-data.ts (INITIAL_POSTS - główny feed, GROUP_POSTS - feed grupy
+         Photography Lovers). image_media_id zostaje NULL - imageUrl w mocku to
+         statyczny asset (resources/post/*.png), nie realny plik w wolumenie media.
+         Nie odwzorowujemy mockowych likeCount/upvoteCount jako osobnych kolumn -
+         te liczby backend ma liczyć COUNT(*) z post_like/post_upvote; seedujemy
+         pojedyncze wiersze reakcji, dobrane tak, by viewer-relative flagi mocka
+         (liked/upvoted dla CURRENT_USER) odpowiadały dokładnie temu, co ma w bazie
+         John Davis - zob. komentarze przy post_like/post_upvote poniżej. -->
+
+    <changeSet id="seed-003-posts" author="robert.sereda" context="seed">
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000001"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="text" value="Amidst a sprawling sea of emerald, we found solace in a warm embrace, nestled in the heart of a weed field. Surrounded by the untamed beauty of nature ..."/>
+            <column name="created_at" valueComputed="now() - interval '2 days'"/>
+        </insert>
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000002"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="text" value="Amidst a sprawling sea of emerald, we found solace in a warm embrace, nestled in the heart of a weed field. Surrounded by the untamed beauty of nature ..."/>
+            <column name="created_at" valueComputed="now() - interval '1 day'"/>
+        </insert>
+        <!-- GROUP_POSTS - feed grupy Photography Lovers (g1). -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000003"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000002"/>
+            <column name="group_id" value="00000000-0000-0000-0003-000000000001"/>
+            <column name="text" value="Weekend shoot by the lake."/>
+            <column name="created_at" valueComputed="now() - interval '3 days'"/>
+        </insert>
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000004"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000004"/>
+            <column name="group_id" value="00000000-0000-0000-0003-000000000001"/>
+            <column name="text" value="Golden hour in the city."/>
+            <column name="created_at" valueComputed="now() - interval '2 days 12 hours'"/>
+        </insert>
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000005"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000005"/>
+            <column name="group_id" value="00000000-0000-0000-0003-000000000001"/>
+            <column name="text" value="Any recommendations for a budget tripod?"/>
+            <column name="created_at" valueComputed="now() - interval '2 days'"/>
+        </insert>
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000006"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000003"/>
+            <column name="group_id" value="00000000-0000-0000-0003-000000000001"/>
+            <column name="text" value="Our next meetup is Saturday morning."/>
+            <column name="created_at" valueComputed="now() - interval '1 day 6 hours'"/>
+        </insert>
+    </changeSet>
+
+    <!-- Komentarze pod p1 (mock INITIAL_POSTS[0].comments[0] - Jamal; drugi komentarz
+         od Solomon dodany, żeby notyfikacja n2 ("Solomon Rhodes commented on your
+         post") miała odpowiadający jej wiersz w comment). -->
+    <changeSet id="seed-003-comments" author="robert.sereda" context="seed">
+        <insert tableName="comment">
+            <column name="id" value="00000000-0000-0000-0007-000000000001"/>
+            <column name="post_id" value="00000000-0000-0000-0002-000000000001"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000002"/>
+            <column name="text" value="This is beautiful!"/>
+            <column name="created_at" valueComputed="now() - interval '1 day 20 hours'"/>
+        </insert>
+        <insert tableName="comment">
+            <column name="id" value="00000000-0000-0000-0007-000000000002"/>
+            <column name="post_id" value="00000000-0000-0000-0002-000000000001"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000003"/>
+            <column name="text" value="Great shot, where was this taken?"/>
+            <column name="created_at" valueComputed="now() - interval '1 hour'"/>
+        </insert>
+    </changeSet>
+
+    <!-- post_like: liked/upvoted/interested w mocku są viewer-relative względem
+         CURRENT_USER (John Davis) - wiersze dla Johna muszą dokładnie odpowiadać
+         flagom z mocka. Mock: p1/p2 liked:false, gp1/gp3/gp4 liked:false, gp2
+         liked:true -> John lajkuje tylko gp2. Inne wiersze (Jamal/Solomon na p1)
+         to dodatkowy, niezależny ruch społeczności, nie wpływający na flagę Johna. -->
+    <changeSet id="seed-003-post-likes" author="robert.sereda" context="seed">
+        <insert tableName="post_like">
+            <column name="post_id" value="00000000-0000-0000-0002-000000000001"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000002"/>
+            <column name="created_at" valueComputed="now() - interval '5 minutes'"/>
+        </insert>
+        <insert tableName="post_like">
+            <column name="post_id" value="00000000-0000-0000-0002-000000000001"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000003"/>
+            <column name="created_at" valueComputed="now() - interval '1 day 21 hours'"/>
+        </insert>
+        <!-- gp2 (Golden hour in the city) - liked:true w mocku dla CURRENT_USER. -->
+        <insert tableName="post_like">
+            <column name="post_id" value="00000000-0000-0000-0002-000000000004"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="created_at" valueComputed="now() - interval '2 days'"/>
+        </insert>
+    </changeSet>
+
+    <!-- post_upvote: mock nie ma żadnego posta z upvoted:true dla CURRENT_USER, więc
+         John nie ma tu żadnego wiersza - upvote'y seedujemy tylko od innych userów,
+         jako niezależny ruch społeczności (nie wpływa na viewer-relative flagę Johna). -->
+    <changeSet id="seed-003-post-upvotes" author="robert.sereda" context="seed">
+        <insert tableName="post_upvote">
+            <column name="post_id" value="00000000-0000-0000-0002-000000000001"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000004"/>
+            <column name="created_at" valueComputed="now() - interval '1 day 19 hours'"/>
+        </insert>
+        <insert tableName="post_upvote">
+            <column name="post_id" value="00000000-0000-0000-0002-000000000003"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000005"/>
+            <column name="created_at" valueComputed="now() - interval '2 days 23 hours'"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

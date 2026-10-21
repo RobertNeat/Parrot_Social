@@ -3,12 +3,22 @@
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-        http://www.liquibase.org/xml/ns/dbchangelog/latest/dbchangelog.xsd">
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <!-- Schemat aplikacji: dodawaj kolejne changesety/changelogi tutaj. -->
+    <!-- relativeToChangelogFile="true" - kontener montuje tylko ./liquibase, więc
+         ścieżka "deploy/liquibase/..." nie istnieje w kontenerze. -->
 
-    <include file="deploy/liquibase/changelog/001-media.xml" relativeToChangelogFile="false"/>
+    <include file="changelog/001-media.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/002-users.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/003-media-owner-fk.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/004-groups.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/005-posts.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/006-events.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/007-chat.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/008-notifications.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/009-friendship.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/010-indexes.xml" relativeToChangelogFile="true"/>
 
-    <include file="deploy/liquibase/seed/changelog-seed.xml" relativeToChangelogFile="false" context="seed"/>
+    <include file="seed/changelog-seed.xml" relativeToChangelogFile="true" context="seed"/>
 
 </databaseChangeLog>

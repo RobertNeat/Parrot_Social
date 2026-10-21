@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- post.group_id nullable - post bez grupy trafia na główny feed (zgodnie z PostDto:
+         groupId jest opcjonalne). image_media_id nullable FK do media (MediaRefDto z DTO
+         jest efemerycznym tokenem budowanym przez backend, nie jest tym samym co FK). -->
+    <changeSet id="005-post-create-table" author="robert.sereda">
+        <createTable tableName="post">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="author_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="group_id" type="uuid"/>
+            <column name="text" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image_media_id" type="uuid"/>
+            <column name="created_at" type="timestamptz" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- RESTRICT - usunięcie autora nie powinno po cichu usuwać jego postów (inni
+         mogli je skomentować/polubić); decyzja o czyszczeniu treści to sprawa app-level. -->
+    <changeSet id="005-post-author-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="post" baseColumnNames="author_id"
+            constraintName="fk_post_author"
+            referencedTableName="users" referencedColumnNames="id"
+            onDelete="RESTRICT"/>
+    </changeSet>
+
+    <!-- CASCADE - post grupowy jest ściśle własnością grupy; usunięcie grupy usuwa
+         jej posty razem z nią (SET NULL przeniosłoby je po cichu na główny feed). -->
+    <changeSet id="005-post-group-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="post" baseColumnNames="group_id"
+            constraintName="fk_post_group"
+            referencedTableName="groups" referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+    <!-- SET NULL - usunięcie pliku obrazka nie powinno usuwać posta, tylko zostawić
+         go bez obrazka. -->
+    <changeSet id="005-post-image-media-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="post" baseColumnNames="image_media_id"
+            constraintName="fk_post_image_media"
+            referencedTableName="media" referencedColumnNames="id"
+            onDelete="SET NULL"/>
+    </changeSet>
+
+    <!-- comment - ściśle podrzędny wobec posta, więc CASCADE. Autor komentarza RESTRICT
+         z tych samych powodów co author_id w post. -->
+    <changeSet id="005-comment-create-table" author="robert.sereda">
+        <createTable tableName="comment">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="post_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="author_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="text" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamptz" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="005-comment-post-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="comment" baseColumnNames="post_id"
+            constraintName="fk_comment_post"
+            referencedTableName="post" referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="005-comment-author-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="comment" baseColumnNames="author_id"
+            constraintName="fk_comment_author"
+            referencedTableName="users" referencedColumnNames="id"
+            onDelete="RESTRICT"/>
+    </changeSet>
+
+    <!-- post_like i post_upvote - dwie odrębne tabele, bo like i upvote to dwie różne,
+         niezależne reakcje na post (PostDto ma oddzielne liked/likeCount i
+         upvoted/upvoteCount par). CASCADE po obu stronach - wiersz reakcji żyje tylko
+         w kontekście istniejącego posta i użytkownika. -->
+    <changeSet id="005-post-like-create-table" author="robert.sereda">
+        <createTable tableName="post_like">
+            <column name="post_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamptz" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="005-post-like-pk" author="robert.sereda">
+        <addPrimaryKey tableName="post_like" columnNames="post_id, user_id"
+            constraintName="pk_post_like"/>
+    </changeSet>
+
+    <changeSet id="005-post-like-post-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="post_like" baseColumnNames="post_id"
+            constraintName="fk_post_like_post"
+            referencedTableName="post" referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="005-post-like-user-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="post_like" baseColumnNames="user_id"
+            constraintName="fk_post_like_user"
+            referencedTableName="users" referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="005-post-upvote-create-table" author="robert.sereda">
+        <createTable tableName="post_upvote">
+            <column name="post_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamptz" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="005-post-upvote-pk" author="robert.sereda">
+        <addPrimaryKey tableName="post_upvote" columnNames="post_id, user_id"
+            constraintName="pk_post_upvote"/>
+    </changeSet>
+
+    <changeSet id="005-post-upvote-post-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="post_upvote" baseColumnNames="post_id"
+            constraintName="fk_post_upvote_post"
+            referencedTableName="post" referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="005-post-upvote-user-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="post_upvote" baseColumnNames="user_id"
+            constraintName="fk_post_upvote_user"
+            referencedTableName="users" referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

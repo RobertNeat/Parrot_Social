@@ -27,7 +27,7 @@ export class MediaStorageService {
     );
   }
 
-  // TODO: read from the docker volume (see open item: no volume mount defined yet in deploy/compose*.yml).
+  // TODO: read from PARROT_MEDIA_DIR (the docker volume mounted at /data, see deploy/compose.yml).
   async readFile(_storedFileName: string): Promise<StoredMediaFile> {
     throw new NotImplementedException('Media file storage is not wired yet.');
   }

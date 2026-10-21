@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- FRIENDS z mock-data.ts (Jamal, Solomon, John Strong, Nevaeh) - znajomości
+         zaakceptowane z CURRENT_USER (John Davis). Pending zaproszenie od Zakaria
+         Mccoy odpowiada notification n5 - zob. komentarz w 006-seed-notifications.xml. -->
+    <changeSet id="seed-007-friendship" author="robert.sereda" context="seed">
+        <insert tableName="friendship">
+            <column name="id" value="00000000-0000-0000-0009-000000000001"/>
+            <column name="requester_id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="addressee_id" value="00000000-0000-0000-0001-000000000002"/>
+            <column name="status" value="accepted"/>
+            <column name="created_at" valueComputed="now() - interval '200 days'"/>
+        </insert>
+        <insert tableName="friendship">
+            <column name="id" value="00000000-0000-0000-0009-000000000002"/>
+            <column name="requester_id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="addressee_id" value="00000000-0000-0000-0001-000000000003"/>
+            <column name="status" value="accepted"/>
+            <column name="created_at" valueComputed="now() - interval '150 days'"/>
+        </insert>
+        <insert tableName="friendship">
+            <column name="id" value="00000000-0000-0000-0009-000000000003"/>
+            <column name="requester_id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="addressee_id" value="00000000-0000-0000-0001-000000000004"/>
+            <column name="status" value="accepted"/>
+            <column name="created_at" valueComputed="now() - interval '100 days'"/>
+        </insert>
+        <insert tableName="friendship">
+            <column name="id" value="00000000-0000-0000-0009-000000000004"/>
+            <column name="requester_id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="addressee_id" value="00000000-0000-0000-0001-000000000005"/>
+            <column name="status" value="accepted"/>
+            <column name="created_at" valueComputed="now() - interval '80 days'"/>
+        </insert>
+        <!-- pending - odpowiada notification n5 (friend-request od Zakaria) -->
+        <insert tableName="friendship">
+            <column name="id" value="00000000-0000-0000-0009-000000000005"/>
+            <column name="requester_id" value="00000000-0000-0000-0001-000000000009"/>
+            <column name="addressee_id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="status" value="pending"/>
+            <column name="created_at" valueComputed="now() - interval '2 days'"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

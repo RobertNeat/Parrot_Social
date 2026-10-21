@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- conversation modelowana jako wsparcie 2+ uczestników (conversation_participant);
+         rozmowa 1:1 to po prostu konwersacja z dwoma wierszami uczestników.
+         ConversationDto.contactId ("druga strona z punktu widzenia viewera") to
+         kwestia warstwy prezentacji/resolvera, nie ograniczenie schematu. -->
+    <changeSet id="007-conversation-create-table" author="robert.sereda">
+        <createTable tableName="conversation">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamptz" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="007-conversation-participant-create-table" author="robert.sereda">
+        <createTable tableName="conversation_participant">
+            <column name="conversation_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="007-conversation-participant-pk" author="robert.sereda">
+        <addPrimaryKey tableName="conversation_participant" columnNames="conversation_id, user_id"
+            constraintName="pk_conversation_participant"/>
+    </changeSet>
+
+    <!-- CASCADE - wiersz uczestnictwa ma sens tylko w kontekście istniejącej
+         konwersacji i istniejącego użytkownika. -->
+    <changeSet id="007-conversation-participant-conversation-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="conversation_participant" baseColumnNames="conversation_id"
+            constraintName="fk_conv_participant_conversation"
+            referencedTableName="conversation" referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="007-conversation-participant-user-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="conversation_participant" baseColumnNames="user_id"
+            constraintName="fk_conv_participant_user"
+            referencedTableName="users" referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+    <!-- chat_message - podrzędne wobec konwersacji (CASCADE). sender_id RESTRICT,
+         analogicznie do post.author_id - usunięcie konta nie powinno po cichu
+         wyczyścić historii czatu innych uczestników. -->
+    <changeSet id="007-chat-message-create-table" author="robert.sereda">
+        <createTable tableName="chat_message">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="conversation_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sender_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="text" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image_media_id" type="uuid"/>
+            <column name="created_at" type="timestamptz" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="007-chat-message-conversation-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="chat_message" baseColumnNames="conversation_id"
+            constraintName="fk_chat_message_conversation"
+            referencedTableName="conversation" referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="007-chat-message-sender-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="chat_message" baseColumnNames="sender_id"
+            constraintName="fk_chat_message_sender"
+            referencedTableName="users" referencedColumnNames="id"
+            onDelete="RESTRICT"/>
+    </changeSet>
+
+    <changeSet id="007-chat-message-image-media-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="chat_message" baseColumnNames="image_media_id"
+            constraintName="fk_chat_message_image_media"
+            referencedTableName="media" referencedColumnNames="id"
+            onDelete="SET NULL"/>
+    </changeSet>
+
+</databaseChangeLog>

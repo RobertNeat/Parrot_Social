@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="006-event-create-table" author="robert.sereda">
+        <createTable tableName="event">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image_media_id" type="uuid"/>
+            <column name="starts_at" type="timestamptz">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamptz" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- SET NULL - tak jak przy post.image_media_id: usunięcie pliku nie usuwa eventu. -->
+    <changeSet id="006-event-image-media-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="event" baseColumnNames="image_media_id"
+            constraintName="fk_event_image_media"
+            referencedTableName="media" referencedColumnNames="id"
+            onDelete="SET NULL"/>
+    </changeSet>
+
+    <!-- event_interest - jedna reakcja per (event, user), analogicznie do post_like. -->
+    <changeSet id="006-event-interest-create-table" author="robert.sereda">
+        <createTable tableName="event_interest">
+            <column name="event_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamptz" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="006-event-interest-pk" author="robert.sereda">
+        <addPrimaryKey tableName="event_interest" columnNames="event_id, user_id"
+            constraintName="pk_event_interest"/>
+    </changeSet>
+
+    <changeSet id="006-event-interest-event-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="event_interest" baseColumnNames="event_id"
+            constraintName="fk_event_interest_event"
+            referencedTableName="event" referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="006-event-interest-user-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="event_interest" baseColumnNames="user_id"
+            constraintName="fk_event_interest_user"
+            referencedTableName="users" referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

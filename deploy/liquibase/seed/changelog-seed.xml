@@ -3,10 +3,18 @@
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-        http://www.liquibase.org/xml/ns/dbchangelog/latest/dbchangelog.xsd">
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <!-- Seeder danych startowych. Na razie pusty - dodawaj changesety z
-         danymi referencyjnymi/demo w miarę potrzeb aplikacji. Uruchamiany
-         tylko w kontekście "seed" (PARROT_SEED_DATA=true), zob. compose.yml. -->
+    <!-- Seeder danych startowych - odwzorowanie apps/parrot_web mock-data.ts.
+         Uruchamiany tylko w kontekście "seed" (zob. compose.yml); context="seed"
+         ustawiony tu na <include> ORAZ na każdym changesecie wewnątrz plików. -->
+
+    <include file="001-seed-users.xml" relativeToChangelogFile="true" context="seed"/>
+    <include file="002-seed-groups.xml" relativeToChangelogFile="true" context="seed"/>
+    <include file="003-seed-posts.xml" relativeToChangelogFile="true" context="seed"/>
+    <include file="004-seed-events.xml" relativeToChangelogFile="true" context="seed"/>
+    <include file="005-seed-chat.xml" relativeToChangelogFile="true" context="seed"/>
+    <include file="006-seed-notifications.xml" relativeToChangelogFile="true" context="seed"/>
+    <include file="007-seed-friendship.xml" relativeToChangelogFile="true" context="seed"/>
 
 </databaseChangeLog>

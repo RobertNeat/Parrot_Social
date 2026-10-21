@@ -84,9 +84,9 @@ przed `parrot-api` (`depends_on: liquibase: condition:
 service_completed_successfully`). Changelogi leżą w `deploy/liquibase/` i są
 montowane do kontenera jako wolumen tylko do odczytu — ten katalog jest
 kopiowany na host obok `compose.yml` przez `deploy_compose_ssh.sh`. Seed danych
-startowych (`deploy/liquibase/seed/changelog-seed.xml`) jest obecnie pusty i
-uruchamia się tylko w kontekście `seed`, włączanym zmienną
-`PARROT_SEED_DATA=true`.
+startowych (`deploy/liquibase/seed/changelog-seed.xml`) uruchamia się tylko w
+kontekście `seed`, włączanym przez `PARROT_LIQUIBASE_CONTEXTS=schema,seed`
+(domyślnie `schema` - bez seeda, bezpieczne dla produkcji).
 
 Ten projekt nie korzysta z mTLS, FHIR, SNOMED/Snowstorm ani usług mockowych
 Spring Boot — są to elementy specyficzne dla innego, niezwiązanego projektu

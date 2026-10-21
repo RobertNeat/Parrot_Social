@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- friendship - relacja dwustronna, ale skierowana (requester/addressee) żeby
+         rozróżnić kto wysłał zaproszenie (status pending) od zaakceptowanej
+         znajomości (status accepted). shell.html/mock FRIENDS odpowiada zbiorowi
+         znajomości accepted dla danego użytkownika (w obie strony); contacts/rozmowy
+         to odrębna relacja (conversation_participant), nie friendship. -->
+    <changeSet id="009-friendship-create-table" author="robert.sereda">
+        <createTable tableName="friendship">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="requester_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="addressee_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(16)" defaultValue="pending">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamptz" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="009-friendship-status-check" author="robert.sereda">
+        <sql>
+            ALTER TABLE friendship ADD CONSTRAINT chk_friendship_status
+                CHECK (status IN ('pending', 'accepted'));
+        </sql>
+        <rollback>
+            ALTER TABLE friendship DROP CONSTRAINT chk_friendship_status;
+        </rollback>
+    </changeSet>
+
+    <!-- requester != addressee - nie da się wysłać zaproszenia do samego siebie. -->
+    <changeSet id="009-friendship-no-self-check" author="robert.sereda">
+        <sql>
+            ALTER TABLE friendship ADD CONSTRAINT chk_friendship_no_self
+                CHECK (requester_id != addressee_id);
+        </sql>
+        <rollback>
+            ALTER TABLE friendship DROP CONSTRAINT chk_friendship_no_self;
+        </rollback>
+    </changeSet>
+
+    <!-- Unikalność pary niezależnie od kierunku (A->B i B->A to ta sama relacja) -
+         indeks na znormalizowanej, nieskierowanej parze (least/greatest), żeby nie
+         dało się utworzyć dwóch wierszy dla tej samej pary użytkowników. -->
+    <changeSet id="009-friendship-unique-pair" author="robert.sereda">
+        <sql>
+            CREATE UNIQUE INDEX ux_friendship_pair ON friendship (
+                LEAST(requester_id, addressee_id),
+                GREATEST(requester_id, addressee_id)
+            );
+        </sql>
+        <rollback>
+            DROP INDEX ux_friendship_pair;
+        </rollback>
+    </changeSet>
+
+    <!-- CASCADE po obu stronach - wiersz relacji ma sens tylko w kontekście obu
+         istniejących kont. -->
+    <changeSet id="009-friendship-requester-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="friendship" baseColumnNames="requester_id"
+            constraintName="fk_friendship_requester"
+            referencedTableName="users" referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="009-friendship-addressee-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="friendship" baseColumnNames="addressee_id"
+            constraintName="fk_friendship_addressee"
+            referencedTableName="users" referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

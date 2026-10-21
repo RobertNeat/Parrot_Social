@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Tabela users. password_hash (nie "password") - hashowanie odbywa się w warstwie
+         aplikacji, kolumna przechowuje tylko wynik (np. bcrypt/argon2). avatar_media_id/
+         cover_media_id to nullable FK do media.id - DTO wystawia MediaRefDto (efemeryczny
+         token dostępu budowany przez backend), ale w bazie trzymamy tylko wskaźnik na
+         konkretne medium. -->
+    <changeSet id="002-users-create-table" author="robert.sereda">
+        <createTable tableName="users">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="username" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password_hash" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="first_name" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bio" type="text"/>
+            <column name="work" type="varchar(255)"/>
+            <column name="education" type="varchar(255)"/>
+            <column name="relationship" type="varchar(100)"/>
+            <column name="inhabitance" type="varchar(255)"/>
+            <column name="provenance" type="varchar(255)"/>
+            <column name="avatar_media_id" type="uuid"/>
+            <column name="cover_media_id" type="uuid"/>
+            <column name="created_at" type="timestamptz" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Unikalność case-insensitive - zwykły UNIQUE na varchar jest case-sensitive,
+         więc "John.Davis@x.com" i "john.davis@x.com" mogłyby stać się dwoma kontami.
+         Logowanie (LoginRequestDto.identifier - username lub email) i rejestracja
+         muszą porównywać po lower() tak jak ten indeks. -->
+    <changeSet id="002-users-username-unique-ci" author="robert.sereda">
+        <sql>
+            CREATE UNIQUE INDEX ux_users_username_lower ON users (LOWER(username));
+        </sql>
+        <rollback>
+            DROP INDEX ux_users_username_lower;
+        </rollback>
+    </changeSet>
+
+    <changeSet id="002-users-email-unique-ci" author="robert.sereda">
+        <sql>
+            CREATE UNIQUE INDEX ux_users_email_lower ON users (LOWER(email));
+        </sql>
+        <rollback>
+            DROP INDEX ux_users_email_lower;
+        </rollback>
+    </changeSet>
+
+    <!-- FK na media z ON DELETE SET NULL - usunięcie pliku avatara/cover nie powinno
+         kaskadowo usuwać konta użytkownika; porządkowanie osieroconych rekordów media
+         to zadanie warstwy aplikacji. -->
+    <changeSet id="002-users-avatar-media-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="users" baseColumnNames="avatar_media_id"
+            constraintName="fk_users_avatar_media"
+            referencedTableName="media" referencedColumnNames="id"
+            onDelete="SET NULL"/>
+    </changeSet>
+
+    <changeSet id="002-users-cover-media-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="users" baseColumnNames="cover_media_id"
+            constraintName="fk_users_cover_media"
+            referencedTableName="media" referencedColumnNames="id"
+            onDelete="SET NULL"/>
+    </changeSet>
+
+</databaseChangeLog>

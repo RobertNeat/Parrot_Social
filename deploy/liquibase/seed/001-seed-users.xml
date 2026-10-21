@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Użytkownicy seedowi odwzorowani z apps/parrot_web mock-data.ts (CURRENT_USER,
+         FRIENDS, CONTACTS). Stałe UUID (schemat 00000000-0000-0000-0001-xxxx dla
+         users), żeby kolejne pliki seeda mogły się do nich odwoływać bez generowania
+         ich na nowo. avatar_media_id/cover_media_id pozostają NULL - avatary w mocku
+         to statyczne assety frontendu (resources/person/*.png), nie realne pliki w
+         wolumenie media; tworzenie fałszywych wierszy media pod nieistniejące pliki
+         byłoby mniej uczciwe niż zostawienie FK NULL. password_hash to placeholder -
+         konta seedowe nie są loginowalne, bo warstwa auth jeszcze nie istnieje. -->
+    <changeSet id="seed-001-users" author="robert.sereda" context="seed">
+        <insert tableName="users">
+            <column name="id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="username" value="john.davis"/>
+            <column name="email" value="john.davis@example.com"/>
+            <column name="password_hash" value="SEED_NO_LOGIN_PLACEHOLDER"/>
+            <column name="first_name" value="John"/>
+            <column name="last_name" value="Davis"/>
+            <column name="bio" value="Adventurer, Photographer, Optimist. Let's connect!"/>
+            <column name="work" value="IT Programmer"/>
+            <column name="education" value="High School"/>
+            <column name="relationship" value="Single"/>
+            <column name="inhabitance" value="Warsaw"/>
+            <column name="provenance" value="Lublin"/>
+            <column name="created_at" valueComputed="TIMESTAMPTZ '2004-10-16 00:00:00+00'"/>
+        </insert>
+        <insert tableName="users">
+            <column name="id" value="00000000-0000-0000-0001-000000000002"/>
+            <column name="username" value="jamal.pearson"/>
+            <column name="email" value="jamal@example.com"/>
+            <column name="password_hash" value="SEED_NO_LOGIN_PLACEHOLDER"/>
+            <column name="first_name" value="Jamal"/>
+            <column name="last_name" value="Pearson"/>
+            <column name="bio" value="Living life one trail at a time."/>
+            <column name="created_at" valueComputed="TIMESTAMPTZ '2019-03-02 00:00:00+00'"/>
+        </insert>
+        <insert tableName="users">
+            <column name="id" value="00000000-0000-0000-0001-000000000003"/>
+            <column name="username" value="solomon.rhodes"/>
+            <column name="email" value="solomon@example.com"/>
+            <column name="password_hash" value="SEED_NO_LOGIN_PLACEHOLDER"/>
+            <column name="first_name" value="Solomon"/>
+            <column name="last_name" value="Rhodes"/>
+            <column name="bio" value="Coffee, code, repeat."/>
+            <column name="created_at" valueComputed="TIMESTAMPTZ '2020-07-11 00:00:00+00'"/>
+        </insert>
+        <insert tableName="users">
+            <column name="id" value="00000000-0000-0000-0001-000000000004"/>
+            <column name="username" value="john.strong"/>
+            <column name="email" value="strong@example.com"/>
+            <column name="password_hash" value="SEED_NO_LOGIN_PLACEHOLDER"/>
+            <column name="first_name" value="John"/>
+            <column name="last_name" value="Strong"/>
+            <column name="bio" value="Gym and good vibes."/>
+            <column name="created_at" valueComputed="TIMESTAMPTZ '2021-01-05 00:00:00+00'"/>
+        </insert>
+        <insert tableName="users">
+            <column name="id" value="00000000-0000-0000-0001-000000000005"/>
+            <column name="username" value="nevaeh.arias"/>
+            <column name="email" value="nevaeh@example.com"/>
+            <column name="password_hash" value="SEED_NO_LOGIN_PLACEHOLDER"/>
+            <column name="first_name" value="Nevaeh"/>
+            <column name="last_name" value="Arias"/>
+            <column name="bio" value="Here for the stories."/>
+            <column name="created_at" valueComputed="TIMESTAMPTZ '2018-04-28 00:00:00+00'"/>
+        </insert>
+        <insert tableName="users">
+            <column name="id" value="00000000-0000-0000-0001-000000000006"/>
+            <column name="username" value="marvin.barlow"/>
+            <column name="email" value="marvin@example.com"/>
+            <column name="password_hash" value="SEED_NO_LOGIN_PLACEHOLDER"/>
+            <column name="first_name" value="Marvin"/>
+            <column name="last_name" value="Barlow"/>
+            <column name="created_at" valueComputed="TIMESTAMPTZ '2017-01-01 00:00:00+00'"/>
+        </insert>
+        <insert tableName="users">
+            <column name="id" value="00000000-0000-0000-0001-000000000007"/>
+            <column name="username" value="tomas.gutierrez"/>
+            <column name="email" value="tomas@example.com"/>
+            <column name="password_hash" value="SEED_NO_LOGIN_PLACEHOLDER"/>
+            <column name="first_name" value="Tomas"/>
+            <column name="last_name" value="Gutierrez"/>
+            <column name="created_at" valueComputed="TIMESTAMPTZ '2017-01-01 00:00:00+00'"/>
+        </insert>
+        <insert tableName="users">
+            <column name="id" value="00000000-0000-0000-0001-000000000008"/>
+            <column name="username" value="allan.bullock"/>
+            <column name="email" value="allan@example.com"/>
+            <column name="password_hash" value="SEED_NO_LOGIN_PLACEHOLDER"/>
+            <column name="first_name" value="Allan"/>
+            <column name="last_name" value="Bullock"/>
+            <column name="created_at" valueComputed="TIMESTAMPTZ '2017-01-01 00:00:00+00'"/>
+        </insert>
+        <insert tableName="users">
+            <column name="id" value="00000000-0000-0000-0001-000000000009"/>
+            <column name="username" value="zakaria.mccoy"/>
+            <column name="email" value="zakaria@example.com"/>
+            <column name="password_hash" value="SEED_NO_LOGIN_PLACEHOLDER"/>
+            <column name="first_name" value="Zakaria"/>
+            <column name="last_name" value="Mccoy"/>
+            <column name="created_at" valueComputed="TIMESTAMPTZ '2017-01-01 00:00:00+00'"/>
+        </insert>
+        <insert tableName="users">
+            <column name="id" value="00000000-0000-0000-0001-000000000010"/>
+            <column name="username" value="seamus.ross"/>
+            <column name="email" value="seamus@example.com"/>
+            <column name="password_hash" value="SEED_NO_LOGIN_PLACEHOLDER"/>
+            <column name="first_name" value="Seamus"/>
+            <column name="last_name" value="Ross"/>
+            <column name="created_at" valueComputed="TIMESTAMPTZ '2017-01-01 00:00:00+00'"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

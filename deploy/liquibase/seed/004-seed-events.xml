@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- EVENTS z mock-data.ts. image_media_id NULL (asset statyczny frontendu, zob.
+         uzasadnienie w 003-seed-posts.xml). interestedCount z mocka nie jest
+         odwzorowywane 1:1 - backend liczy COUNT(*) z event_interest; seedujemy
+         pojedyncze wiersze interested dla CURRENT_USER na eventach, które w mocku
+         mają interested:true (e1, e3, e6). -->
+    <changeSet id="seed-004-events" author="robert.sereda" context="seed">
+        <insert tableName="event">
+            <column name="id" value="00000000-0000-0000-0004-000000000001"/>
+            <column name="title" value="Charity Gala Night"/>
+            <column name="description" value="Join us for an elegant evening of giving, where we'll come together to raise funds for local charities. Enjoy a night of fine dining, live entertainment, and philanthropy."/>
+            <column name="starts_at" valueComputed="now() + interval '5 days'"/>
+            <column name="created_at" valueComputed="now() - interval '10 days'"/>
+        </insert>
+        <insert tableName="event">
+            <column name="id" value="00000000-0000-0000-0004-000000000002"/>
+            <column name="title" value="Tech Innovators Meetup"/>
+            <column name="description" value="Calling all tech enthusiasts! Connect with industry leaders, share ideas, and stay ahead of the curve at our Tech Innovators Meetup. Network with ..."/>
+            <column name="starts_at" valueComputed="now() + interval '12 days'"/>
+            <column name="created_at" valueComputed="now() - interval '9 days'"/>
+        </insert>
+        <insert tableName="event">
+            <column name="id" value="00000000-0000-0000-0004-000000000003"/>
+            <column name="title" value="Cultural Fusion Festival"/>
+            <column name="description" value="Celebrate diversity and cultural richness at our Cultural Fusion Festival. Experience a melting pot of traditions, music, dance, and cuisine from around ..."/>
+            <column name="starts_at" valueComputed="now() + interval '20 days'"/>
+            <column name="created_at" valueComputed="now() - interval '8 days'"/>
+        </insert>
+        <insert tableName="event">
+            <column name="id" value="00000000-0000-0000-0004-000000000004"/>
+            <column name="title" value="Summer Music Festival"/>
+            <column name="description" value="A three-day celebration of live music across five stages, food trucks and art installations. Grab your friends and your dancing shoes."/>
+            <column name="starts_at" valueComputed="now() + interval '30 days'"/>
+            <column name="created_at" valueComputed="now() - interval '7 days'"/>
+        </insert>
+        <insert tableName="event">
+            <column name="id" value="00000000-0000-0000-0004-000000000005"/>
+            <column name="title" value="Underground Beats Night"/>
+            <column name="description" value="An intimate club night featuring up-and-coming DJs spinning house and techno until sunrise."/>
+            <column name="starts_at" valueComputed="now() + interval '15 days'"/>
+            <column name="created_at" valueComputed="now() - interval '6 days'"/>
+        </insert>
+        <insert tableName="event">
+            <column name="id" value="00000000-0000-0000-0004-000000000006"/>
+            <column name="title" value="New Year Fireworks"/>
+            <column name="description" value="Ring in the new year with the whole city - live music, food stalls and a spectacular fireworks show at midnight."/>
+            <column name="starts_at" valueComputed="now() + interval '60 days'"/>
+            <column name="created_at" valueComputed="now() - interval '5 days'"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-004-event-interest" author="robert.sereda" context="seed">
+        <insert tableName="event_interest">
+            <column name="event_id" value="00000000-0000-0000-0004-000000000001"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="created_at" valueComputed="now() - interval '9 days'"/>
+        </insert>
+        <insert tableName="event_interest">
+            <column name="event_id" value="00000000-0000-0000-0004-000000000003"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="created_at" valueComputed="now() - interval '7 days'"/>
+        </insert>
+        <insert tableName="event_interest">
+            <column name="event_id" value="00000000-0000-0000-0004-000000000006"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="created_at" valueComputed="now() - interval '4 days'"/>
+        </insert>
+        <!-- dodatkowe wiersze zainteresowania od innych użytkowników, żeby interestedCount
+             z mocka (np. e1=3) było zbliżone do rzeczywistej liczby wierszy. -->
+        <insert tableName="event_interest">
+            <column name="event_id" value="00000000-0000-0000-0004-000000000001"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000002"/>
+            <column name="created_at" valueComputed="now() - interval '8 days'"/>
+        </insert>
+        <insert tableName="event_interest">
+            <column name="event_id" value="00000000-0000-0000-0004-000000000001"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000003"/>
+            <column name="created_at" valueComputed="now() - interval '8 days'"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

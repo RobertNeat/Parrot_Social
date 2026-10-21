@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Tabela "groups" (nie "group") - group jest słowem zarezerwowanym w Postgres,
+         więc tak jak users (nie "user") unikamy konieczności cytowania identyfikatora
+         w każdym zapytaniu. -->
+    <changeSet id="004-groups-create-table" author="robert.sereda">
+        <createTable tableName="groups">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="owner_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamptz" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- RESTRICT - usunięcie konta właściciela nie powinno po cichu usuwać grupy;
+         wymusza najpierw transfer ownera lub usunięcie grupy jako odrębną decyzję. -->
+    <changeSet id="004-groups-owner-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="groups" baseColumnNames="owner_id"
+            constraintName="fk_groups_owner"
+            referencedTableName="users" referencedColumnNames="id"
+            onDelete="RESTRICT"/>
+    </changeSet>
+
+    <!-- group_member - tabela łącząca członkostwo. memberCount z DTO liczymy COUNT(*)
+         po stronie backendu, nie denormalizujemy. -->
+    <changeSet id="004-group-member-create-table" author="robert.sereda">
+        <createTable tableName="group_member">
+            <column name="group_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="joined_at" type="timestamptz" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="004-group-member-pk" author="robert.sereda">
+        <addPrimaryKey tableName="group_member" columnNames="group_id, user_id"
+            constraintName="pk_group_member"/>
+    </changeSet>
+
+    <!-- CASCADE po obu stronach - wiersz member ma sens tylko w kontekście
+         istniejącej grupy i istniejącego użytkownika. -->
+    <changeSet id="004-group-member-group-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="group_member" baseColumnNames="group_id"
+            constraintName="fk_group_member_group"
+            referencedTableName="groups" referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="004-group-member-user-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="group_member" baseColumnNames="user_id"
+            constraintName="fk_group_member_user"
+            referencedTableName="users" referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

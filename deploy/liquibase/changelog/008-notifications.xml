@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- type jako varchar + CHECK (nie Postgres ENUM) - listę wartości łatwo rozszerzyć
+         kolejnym changesetem (DROP/ADD CONSTRAINT), podczas gdy z enumem usunięcie
+         wartości jest niemożliwe, a ALTER TYPE ... ADD VALUE ma ograniczenia
+         transakcyjne. recipient_id NOT NULL - DTO nie wystawia tego pola (odpowiedź
+         jest implicit scoped do "moich" powiadomień), ale tabela musi wiedzieć,
+         czyje jest powiadomienie. actor_id nullable - powiadomienia systemowe (np.
+         event-reminder, przypomnienie o zbliżającym się evencie) nie mają ludzkiego
+         sprawcy; NotificationDto.actorId/actorName są dla tej samej przyczyny
+         opcjonalne. target_id bez FK - może wskazywać posta, event, grupę lub
+         użytkownika (polimorficzny cel), a Postgres nie ma prostego sposobu na FK
+         "do jednej z kilku tabel" bez dodatkowej złożoności wykraczającej poza zakres
+         tego zadania; ten sam wzorzec jak przy media.owner_id w 001-media.xml. -->
+    <changeSet id="008-notification-create-table" author="robert.sereda">
+        <createTable tableName="notification">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="type" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="actor_id" type="uuid"/>
+            <column name="target_id" type="uuid"/>
+            <column name="created_at" type="timestamptz" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="read" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- addCheckConstraint jest funkcją Liquibase Pro, więc CHECK dodajemy czystym SQL
+         z jawnym rollbackiem. Wartości muszą być zgodne z NotificationType w
+         notification.dto.ts. -->
+    <changeSet id="008-notification-type-check" author="robert.sereda">
+        <sql>
+            ALTER TABLE notification ADD CONSTRAINT chk_notification_type
+                CHECK (type IN ('post-like', 'post-upvote', 'post-comment',
+                                 'event-interest', 'event-reminder', 'group-invite',
+                                 'friend-request'));
+        </sql>
+        <rollback>
+            ALTER TABLE notification DROP CONSTRAINT chk_notification_type;
+        </rollback>
+    </changeSet>
+
+    <!-- CASCADE dla recipient - powiadomienie nie ma sensu bez odbiorcy; usunięcie
+         jego konta usuwa jego powiadomienia. actor_id nullable, więc SET NULL (nie
+         CASCADE) - usunięcie konta aktora nie powinno usuwać powiadomienia u odbiorcy,
+         tylko zostawić je bez przypisanego sprawcy. -->
+    <changeSet id="008-notification-recipient-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="notification" baseColumnNames="recipient_id"
+            constraintName="fk_notification_recipient"
+            referencedTableName="users" referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="008-notification-actor-fk" author="robert.sereda">
+        <addForeignKeyConstraint
+            baseTableName="notification" baseColumnNames="actor_id"
+            constraintName="fk_notification_actor"
+            referencedTableName="users" referencedColumnNames="id"
+            onDelete="SET NULL"/>
+    </changeSet>
+
+</databaseChangeLog>

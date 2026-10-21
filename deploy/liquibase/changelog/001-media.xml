@@ -3,14 +3,16 @@
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-        http://www.liquibase.org/xml/ns/dbchangelog/latest/dbchangelog.xsd">
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <!-- Tabela medium (avatar/post/event/chat image) na przyszłość - plik na dysku
-         (docker volume) jest adresowany przez stored_file_name. `id` (PK) nigdy nie
-         jest zwracane klientowi - attach_handle jest jedynym identyfikatorem, który
-         klient poznaje (z odpowiedzi uploadu) i którym referencjonuje medium w request
-         DTO; media-access.store/service tłumaczy attach_handle na stored_file_name
-         wewnątrz backendu. owner_id bez FK - tabeli users jeszcze nie ma w tym changelogu. -->
+         (wolumen parrot-media, zob. deploy/compose.yml) jest adresowany przez
+         stored_file_name. `id` (PK) nigdy nie jest zwracane klientowi - attach_handle
+         jest jedynym identyfikatorem, który klient poznaje (z odpowiedzi uploadu) i
+         którym referencjonuje medium w request DTO; media-access.store/service
+         tłumaczy attach_handle na stored_file_name wewnątrz backendu. owner_id bez FK
+         w tym changesecie - tabela users jeszcze nie istniała; FK dopięte w
+         003-media-owner-fk.xml. -->
     <changeSet id="001-media-create-table" author="robert.sereda">
         <createTable tableName="media">
             <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">

@@ -12,6 +12,9 @@
 # Dane: tylko `parrot-api` czyta/pisze do PostgreSQL. Migracje schematu i
 # seed danych wykonuje jednorazowy kontener `liquibase` przed startem
 # `parrot-api` (depends_on: service_completed_successfully).
+#
+# Media: pliki wgrywane przez użytkowników żyją w odrębnym wolumenie `parrot-media`
+# (/data w parrot-api) - baza przechowuje tylko metadane (tabela `media`).
 name: parrot-social
 
 services:
@@ -47,8 +50,13 @@ services:
       LIQUIBASE_COMMAND_URL: jdbc:postgresql://postgres:5432/${PARROT_DB_NAME:-parrot_social}
       LIQUIBASE_COMMAND_USERNAME: ${PARROT_DB_USER:-parrot}
       LIQUIBASE_COMMAND_PASSWORD: ${PARROT_DB_PASSWORD:-parrot}
-      LIQUIBASE_COMMAND_CHANGELOG_FILE: /liquibase/changelog/changelog-master.xml
-      LIQUIBASE_COMMAND_CONTEXTS: ${PARROT_SEED_DATA:+seed}
+      # Bez leading "/" - Liquibase traktuje tę wartość jako ścieżkę względną do
+      # searchPath, nie jako absolutną ścieżkę filesystemu (zweryfikowane).
+      LIQUIBASE_COMMAND_CHANGELOG_FILE: changelog/changelog-master.xml
+      # PARROT_LIQUIBASE_CONTEXTS (nie PARROT_SEED_DATA) - ":+" robi "seed" dla
+      # KAŻDEJ niepustej wartości zmiennej, włącznie z "false"; stara zmienna
+      # włączałaby seed niezależnie od wartości. Domyślnie tylko schemat.
+      LIQUIBASE_COMMAND_CONTEXTS: ${PARROT_LIQUIBASE_CONTEXTS:-schema}
     command: ["update"]
     networks:
       - parrot-internal
@@ -64,6 +72,9 @@ services:
       DATABASE_URL: postgresql://${PARROT_DB_USER:-parrot}:${PARROT_DB_PASSWORD:-parrot}@postgres:5432/${PARROT_DB_NAME:-parrot_social}
       PARROT_WEB_ORIGIN: ${PARROT_WEB_ORIGIN:-http://localhost:10700}
       PARROT_API_PUBLIC_ORIGIN: ${PARROT_API_PUBLIC_ORIGIN:-http://localhost:10710}
+      PARROT_MEDIA_DIR: /data/media
+    volumes:
+      - parrot-media:/data
     depends_on:
       liquibase:
         condition: service_completed_successfully
@@ -105,3 +116,4 @@ networks:
 
 volumes:
   postgres-data:
+  parrot-media:

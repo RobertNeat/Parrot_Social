@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- NOTIFICATIONS z mock-data.ts - w mocku każde powiadomienie ma tylko wstępnie
+         wyrenderowany "text" (np. "Jamal Pearson liked your post."); tutaj
+         normalizujemy je do actor_id + type + target_id, które backend wykorzysta do
+         wygenerowania treści po stronie klienta/serwera. Wszystkie dotyczą
+         CURRENT_USER (John Davis) jako recipient_id.
+         n3 ("Charity Gala Night is starting soon") nie ma w mocku żadnego aktora -
+         to systemowe przypomnienie o evencie, nie akcja innego użytkownika. Typ
+         event-reminder z actor_id = NULL (kolumna i pole DTO są nullable właśnie
+         pod ten przypadek).
+         n5 w mocku to "Nevaeh Arias sent you a friend request", ale Nevaeh Arias
+         jest już w FRIENDS (czyli relacja powinna być accepted) - mock ma tu
+         wewnętrzną niespójność. W seedzie n5 pochodzi od Zakaria Mccoy (CONTACTS,
+         nie FRIENDS - realny kandydat na pending zaproszenie), żeby friendship
+         (009-friendship.xml) było spójne z treścią powiadomienia. -->
+    <changeSet id="seed-006-notifications" author="robert.sereda" context="seed">
+        <!-- n1: Jamal Pearson liked your post (p1) -->
+        <insert tableName="notification">
+            <column name="id" value="00000000-0000-0000-0008-000000000001"/>
+            <column name="type" value="post-like"/>
+            <column name="recipient_id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="actor_id" value="00000000-0000-0000-0001-000000000002"/>
+            <column name="target_id" value="00000000-0000-0000-0002-000000000001"/>
+            <column name="created_at" valueComputed="now() - interval '5 minutes'"/>
+            <column name="read" valueBoolean="false"/>
+        </insert>
+        <!-- n2: Solomon Rhodes commented on your post (p1) -->
+        <insert tableName="notification">
+            <column name="id" value="00000000-0000-0000-0008-000000000002"/>
+            <column name="type" value="post-comment"/>
+            <column name="recipient_id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="actor_id" value="00000000-0000-0000-0001-000000000003"/>
+            <column name="target_id" value="00000000-0000-0000-0002-000000000001"/>
+            <column name="created_at" valueComputed="now() - interval '1 hour'"/>
+            <column name="read" valueBoolean="false"/>
+        </insert>
+        <!-- n3: Charity Gala Night is starting soon (e1) - zob. komentarz u góry pliku -->
+        <insert tableName="notification">
+            <column name="id" value="00000000-0000-0000-0008-000000000003"/>
+            <column name="type" value="event-reminder"/>
+            <column name="recipient_id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="target_id" value="00000000-0000-0000-0004-000000000001"/>
+            <column name="created_at" valueComputed="now() - interval '3 hours'"/>
+            <column name="read" valueBoolean="true"/>
+        </insert>
+        <!-- n4: You were added to Photography Lovers (g1) -->
+        <insert tableName="notification">
+            <column name="id" value="00000000-0000-0000-0008-000000000004"/>
+            <column name="type" value="group-invite"/>
+            <column name="recipient_id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="actor_id" value="00000000-0000-0000-0001-000000000002"/>
+            <column name="target_id" value="00000000-0000-0000-0003-000000000001"/>
+            <column name="created_at" valueComputed="now() - interval '1 day'"/>
+            <column name="read" valueBoolean="true"/>
+        </insert>
+        <!-- n5: friend request - zob. komentarz u góry pliku (Zakaria, nie Nevaeh) -->
+        <insert tableName="notification">
+            <column name="id" value="00000000-0000-0000-0008-000000000005"/>
+            <column name="type" value="friend-request"/>
+            <column name="recipient_id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="actor_id" value="00000000-0000-0000-0001-000000000009"/>
+            <column name="created_at" valueComputed="now() - interval '2 days'"/>
+            <column name="read" valueBoolean="true"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
