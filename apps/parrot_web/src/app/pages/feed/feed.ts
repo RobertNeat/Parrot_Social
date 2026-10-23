@@ -13,6 +13,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { FeedService } from '../../core/services/feed.service';
 import { ChatService } from '../../core/services/chat.service';
 import { ContactsService } from '../../core/services/contacts.service';
+import { MediaUploadService } from '../../core/services/media-upload.service';
 import { Post } from '../../core/models/post.model';
 import { PostCard } from '../../shared/components/post-card/post-card';
 import type { UserSummaryDto } from '@parrot-social/shared-dto';
@@ -32,6 +33,7 @@ export class Feed {
   readonly feed = inject(FeedService);
   readonly chat = inject(ChatService);
   private readonly contactsService = inject(ContactsService);
+  private readonly mediaUpload = inject(MediaUploadService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly postsGrid = viewChild.required<ElementRef<HTMLElement>>('postsGrid');
@@ -57,9 +59,20 @@ export class Feed {
   readonly newPostText = signal('');
   readonly activeConversationId = signal('');
   readonly messageText = signal('');
+  readonly attachedImagePreviewUrl = signal<string | null>(null);
+  readonly attaching = signal(false);
+  private attachedImageAttachHandle: string | undefined;
+  private attachedObjectUrl: string | null = null;
 
   selectConversation(id: string): void {
     this.activeConversationId.set(id);
+  }
+
+  selectContact(contactId: string): void {
+    const conversation = this.chat.conversations().find((c) => c.contactId === contactId);
+    if (conversation) {
+      this.activeConversationId.set(conversation.id);
+    }
   }
 
   activeConversation() {
@@ -77,15 +90,47 @@ export class Feed {
     }
   }
 
+  async onImageSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+
+    this.clearAttachedImage();
+    const objectUrl = URL.createObjectURL(file);
+    this.attachedObjectUrl = objectUrl;
+    this.attachedImagePreviewUrl.set(objectUrl);
+    this.attaching.set(true);
+    try {
+      const media = await this.mediaUpload.upload(file);
+      this.attachedImageAttachHandle = media.attachHandle;
+    } catch {
+      this.clearAttachedImage();
+    } finally {
+      this.attaching.set(false);
+    }
+  }
+
+  clearAttachedImage(): void {
+    if (this.attachedObjectUrl) {
+      URL.revokeObjectURL(this.attachedObjectUrl);
+      this.attachedObjectUrl = null;
+    }
+    this.attachedImagePreviewUrl.set(null);
+    this.attachedImageAttachHandle = undefined;
+  }
+
   async sendMessage(): Promise<void> {
     const text = this.messageText().trim();
     const conversationId = this.activeConversationId();
-    if (!text || !conversationId) {
+    const imageAttachHandle = this.attachedImageAttachHandle;
+    if ((!text && !imageAttachHandle) || !conversationId || this.attaching()) {
       return;
     }
-    const ok = await this.chat.sendMessage(conversationId, text);
+    const ok = await this.chat.sendMessage(conversationId, text, imageAttachHandle);
     if (ok) {
       this.messageText.set('');
+      this.clearAttachedImage();
     }
   }
 

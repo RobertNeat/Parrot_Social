@@ -42,14 +42,16 @@
     <ul class="contact-list">
       @for (contact of contacts(); track contact.id) {
         <li>
-          <img
-            class="avatar"
-            [src]="contact.avatar?.url ?? 'resources/person/men_1.png'"
-            [alt]="contact.firstName"
-            width="32"
-            height="32"
-          />
-          <span>{{ contact.firstName }} {{ contact.lastName }}</span>
+          <button type="button" class="contact-row" (click)="selectContact(contact.id)">
+            <img
+              class="avatar"
+              [src]="contact.avatar?.url ?? 'resources/person/men_1.png'"
+              [alt]="contact.firstName"
+              width="32"
+              height="32"
+            />
+            <span>{{ contact.firstName }} {{ contact.lastName }}</span>
+          </button>
         </li>
       }
       <li class="mail-row">
@@ -70,9 +72,30 @@
 
       <div class="mini-chat-messages">
         @for (message of activeConversation()?.messages; track message.id) {
-          <p class="bubble" [class.mine]="message.fromMe">{{ message.text }}</p>
+          <div class="bubble" [class.mine]="message.fromMe">
+            @if (message.imageUrl) {
+              <img class="bubble-image" [src]="message.imageUrl" alt="" />
+            }
+            @if (message.text) {
+              <p>{{ message.text }}</p>
+            }
+          </div>
         }
       </div>
+
+      @if (attachedImagePreviewUrl(); as preview) {
+        <div class="attachment-preview">
+          <img [src]="preview" alt="" />
+          <button
+            type="button"
+            class="btn btn-icon"
+            (click)="clearAttachedImage()"
+            aria-label="Remove attachment"
+          >
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+      }
 
       <div class="mini-chat-input">
         <input
@@ -82,10 +105,23 @@
           [(ngModel)]="messageText"
           (keyup.enter)="sendMessage()"
         />
+        <input
+          #miniImageInput
+          type="file"
+          accept="image/*"
+          class="visually-hidden"
+          (change)="onImageSelected($event)"
+        />
         <button type="button" class="btn btn-icon" (click)="sendMessage()" aria-label="Send">
           <span class="material-symbols-outlined">send</span>
         </button>
-        <button type="button" class="btn btn-icon" aria-label="Attach image">
+        <button
+          type="button"
+          class="btn btn-icon"
+          [disabled]="attaching()"
+          (click)="miniImageInput.click()"
+          aria-label="Attach image"
+        >
           <span class="material-symbols-outlined">image</span>
         </button>
       </div>

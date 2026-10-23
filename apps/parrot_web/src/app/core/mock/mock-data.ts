@@ -307,6 +307,7 @@ export const GROUP_POSTS: Post[] = [
 export const CONVERSATIONS: Conversation[] = [
   {
     id: 'conv-allan',
+    contactId: 'u-allan',
     contactName: 'Allan Bullock',
     contactAvatarUrl: person('men_4.png'),
     messages: [
@@ -317,24 +318,28 @@ export const CONVERSATIONS: Conversation[] = [
   },
   {
     id: 'conv-marvin',
+    contactId: 'u-marvin',
     contactName: 'Marvin Barlow',
     contactAvatarUrl: person('men_2.png'),
     messages: [{ id: 'm4', fromMe: false, text: 'Thanks for the photos!' }],
   },
   {
     id: 'conv-tomas',
+    contactId: 'u-tomas',
     contactName: 'Tomas Gutierrez',
     contactAvatarUrl: person('men_3.png'),
     messages: [{ id: 'm5', fromMe: true, text: 'Let’s catch up this week.' }],
   },
   {
     id: 'conv-zakaria',
+    contactId: 'u-zakaria',
     contactName: 'Zakaria Mccoy',
     contactAvatarUrl: person('men_1.png'),
     messages: [],
   },
   {
     id: 'conv-seamus',
+    contactId: 'u-seamus',
     contactName: 'Seamus Ross',
     contactAvatarUrl: person('men_2.png'),
     messages: [],

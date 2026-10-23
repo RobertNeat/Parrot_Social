@@ -5,9 +5,12 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <!-- Posty z mock-data.ts (INITIAL_POSTS - główny feed, GROUP_POSTS - feed grupy
-         Photography Lovers). image_media_id zostaje NULL - imageUrl w mocku to
-         statyczny asset (resources/post/*.png), nie realny plik w wolumenie media.
+    <!-- Posty rozwinięte względem mock-data.ts: p1/p2 (główny feed Johna Davisa) oraz
+         gp1-gp4 (feed grupy Photography Lovers) to oryginalne posty z mocka,
+         z tekstami poprawionymi tak, by faktycznie opisywały przypisane im zdjęcie
+         (zob. image_media_id w 009-seed-media.xml - ten plik tylko tworzy wiersze
+         post/comment, przypisanie obrazków dzieje się tam). p3-p17 to nowe posty,
+         po 1-2 na pozostałych userów, też dobrane tematycznie do konkretnego zdjęcia.
          Nie odwzorowujemy mockowych likeCount/upvoteCount jako osobnych kolumn -
          te liczby backend ma liczyć COUNT(*) z post_like/post_upvote; seedujemy
          pojedyncze wiersze reakcji, dobrane tak, by viewer-relative flagi mocka
@@ -18,13 +21,13 @@
         <insert tableName="post">
             <column name="id" value="00000000-0000-0000-0002-000000000001"/>
             <column name="author_id" value="00000000-0000-0000-0001-000000000001"/>
-            <column name="text" value="Amidst a sprawling sea of emerald, we found solace in a warm embrace, nestled in the heart of a weed field. Surrounded by the untamed beauty of nature ..."/>
+            <column name="text" value="Amidst a sprawling sea of emerald, we found solace in a warm embrace, nestled in the heart of a windswept field. Just us, the sky, and the quiet."/>
             <column name="created_at" valueComputed="now() - interval '2 days'"/>
         </insert>
         <insert tableName="post">
             <column name="id" value="00000000-0000-0000-0002-000000000002"/>
             <column name="author_id" value="00000000-0000-0000-0001-000000000001"/>
-            <column name="text" value="Amidst a sprawling sea of emerald, we found solace in a warm embrace, nestled in the heart of a weed field. Surrounded by the untamed beauty of nature ..."/>
+            <column name="text" value="Woke up at 4am for this - three balloons inflating in a golden-hour field, mountains lined up in the background. Worth every lost hour of sleep."/>
             <column name="created_at" valueComputed="now() - interval '1 day'"/>
         </insert>
         <!-- GROUP_POSTS - feed grupy Photography Lovers (g1). -->
@@ -32,35 +35,127 @@
             <column name="id" value="00000000-0000-0000-0002-000000000003"/>
             <column name="author_id" value="00000000-0000-0000-0001-000000000002"/>
             <column name="group_id" value="00000000-0000-0000-0003-000000000001"/>
-            <column name="text" value="Weekend shoot by the lake."/>
+            <column name="text" value="Caught this zebra mid-stare on this morning's safari drive. The light in Masai Mara right now is unreal."/>
             <column name="created_at" valueComputed="now() - interval '3 days'"/>
         </insert>
         <insert tableName="post">
             <column name="id" value="00000000-0000-0000-0002-000000000004"/>
             <column name="author_id" value="00000000-0000-0000-0001-000000000004"/>
             <column name="group_id" value="00000000-0000-0000-0003-000000000001"/>
-            <column name="text" value="Golden hour in the city."/>
+            <column name="text" value="Sunrise run with my dog through the park - best way to start the day."/>
             <column name="created_at" valueComputed="now() - interval '2 days 12 hours'"/>
         </insert>
         <insert tableName="post">
             <column name="id" value="00000000-0000-0000-0002-000000000005"/>
             <column name="author_id" value="00000000-0000-0000-0001-000000000005"/>
             <column name="group_id" value="00000000-0000-0000-0003-000000000001"/>
-            <column name="text" value="Any recommendations for a budget tripod?"/>
+            <column name="text" value="Lazy Sunday, a good book, and a quiet corner. This is the whole plan for today."/>
             <column name="created_at" valueComputed="now() - interval '2 days'"/>
         </insert>
         <insert tableName="post">
             <column name="id" value="00000000-0000-0000-0002-000000000006"/>
             <column name="author_id" value="00000000-0000-0000-0001-000000000003"/>
             <column name="group_id" value="00000000-0000-0000-0003-000000000001"/>
-            <column name="text" value="Our next meetup is Saturday morning."/>
+            <column name="text" value="Our next meetup is Saturday morning - same crowd-energy shots as this concert, but hopefully less smoke machine."/>
             <column name="created_at" valueComputed="now() - interval '1 day 6 hours'"/>
+        </insert>
+        <!-- Nowe posty - po 1-2 na pozostałych userów, dobrane do przypisanego zdjęcia. -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000007"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000003"/>
+            <column name="text" value="Giraffes don't care about your schedule. Spent twenty minutes just watching this one chew."/>
+            <column name="created_at" valueComputed="now() - interval '4 days'"/>
+        </insert>
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000008"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000004"/>
+            <column name="text" value="A hyacinth macaw at the sanctuary today - felt extremely on-brand for a Parrot Social post."/>
+            <column name="created_at" valueComputed="now() - interval '5 days'"/>
+        </insert>
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000009"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000006"/>
+            <column name="text" value="Trail run before work, orange cap and all. Nothing clears my head like a few miles through the forest."/>
+            <column name="created_at" valueComputed="now() - interval '3 days 8 hours'"/>
+        </insert>
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000010"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000009"/>
+            <column name="text" value="This red squirrel posed better than most people I photograph."/>
+            <column name="created_at" valueComputed="now() - interval '6 days'"/>
+        </insert>
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000011"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000010"/>
+            <column name="text" value="Balloons over the red mesa at dawn - one of those mornings you don't forget."/>
+            <column name="created_at" valueComputed="now() - interval '7 days'"/>
+        </insert>
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000012"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000003"/>
+            <column name="text" value="Concert night. The energy in that crowd was electric."/>
+            <column name="created_at" valueComputed="now() - interval '9 days'"/>
+        </insert>
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000013"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000004"/>
+            <column name="text" value="Sunday ride with the crew. Legs are done but the views made it worth it."/>
+            <column name="created_at" valueComputed="now() - interval '4 days 10 hours'"/>
+        </insert>
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000014"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000002"/>
+            <column name="text" value="Found this trail deep in the forest - yellow pack, quiet path, no plans to turn back yet."/>
+            <column name="created_at" valueComputed="now() - interval '8 days'"/>
+        </insert>
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000015"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000005"/>
+            <column name="text" value="Sunday mornings are for sunlight, coffee, and whatever book is currently stealing my week."/>
+            <column name="created_at" valueComputed="now() - interval '3 days 4 hours'"/>
+        </insert>
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000016"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000007"/>
+            <column name="text" value="This elk just stood in the middle of the road like he owned it. Fair enough honestly."/>
+            <column name="created_at" valueComputed="now() - interval '5 days 6 hours'"/>
+        </insert>
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000017"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000006"/>
+            <column name="text" value="Highland cow blocking the trail, zero regrets about the detour."/>
+            <column name="created_at" valueComputed="now() - interval '10 days'"/>
+        </insert>
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000018"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000008"/>
+            <column name="text" value="Sleepiest koala in the eucalyptus. Spent way too long just watching it breathe."/>
+            <column name="created_at" valueComputed="now() - interval '6 days 12 hours'"/>
+        </insert>
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000019"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000009"/>
+            <column name="text" value="Arctic ground squirrel staring me down like I owe it rent."/>
+            <column name="created_at" valueComputed="now() - interval '11 days'"/>
+        </insert>
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000020"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000010"/>
+            <column name="text" value="Camp at sunrise, balloons on the horizon - this is why I keep coming back here."/>
+            <column name="created_at" valueComputed="now() - interval '12 days'"/>
+        </insert>
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000021"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000003"/>
+            <column name="text" value="Scrambling over boulders on today's hike, barefoot for the last stretch because why not."/>
+            <column name="created_at" valueComputed="now() - interval '13 days'"/>
         </insert>
     </changeSet>
 
-    <!-- Komentarze pod p1 (mock INITIAL_POSTS[0].comments[0] - Jamal; drugi komentarz
-         od Solomon dodany, żeby notyfikacja n2 ("Solomon Rhodes commented on your
-         post") miała odpowiadający jej wiersz w comment). -->
+    <!-- Komentarze - c1/c2 pod p1 zachowane bez zmian treści (mock INITIAL_POSTS[0].comments[0]
+         - Jamal; drugi komentarz od Solomon odpowiada notyfikacji n2 "Solomon Rhodes
+         commented on your post", zob. 006-seed-notifications.xml). Pozostałe komentarze
+         są nowe, po 1 na każdy z nowych postów, treściowo nawiązujące do zdjęcia/opisu. -->
     <changeSet id="seed-003-comments" author="robert.sereda" context="seed">
         <insert tableName="comment">
             <column name="id" value="00000000-0000-0000-0007-000000000001"/>
@@ -76,13 +171,154 @@
             <column name="text" value="Great shot, where was this taken?"/>
             <column name="created_at" valueComputed="now() - interval '1 hour'"/>
         </insert>
+        <insert tableName="comment">
+            <column name="id" value="00000000-0000-0000-0007-000000000003"/>
+            <column name="post_id" value="00000000-0000-0000-0002-000000000002"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000002"/>
+            <column name="text" value="Those colors against the mountains are unreal, need to try this myself."/>
+            <column name="created_at" valueComputed="now() - interval '20 hours'"/>
+        </insert>
+        <insert tableName="comment">
+            <column name="id" value="00000000-0000-0000-0007-000000000004"/>
+            <column name="post_id" value="00000000-0000-0000-0002-000000000003"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000003"/>
+            <column name="text" value="That contrast is incredible."/>
+            <column name="created_at" valueComputed="now() - interval '2 days 20 hours'"/>
+        </insert>
+        <insert tableName="comment">
+            <column name="id" value="00000000-0000-0000-0007-000000000005"/>
+            <column name="post_id" value="00000000-0000-0000-0002-000000000004"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000002"/>
+            <column name="text" value="Your dog has more energy than me."/>
+            <column name="created_at" valueComputed="now() - interval '2 days 6 hours'"/>
+        </insert>
+        <insert tableName="comment">
+            <column name="id" value="00000000-0000-0000-0007-000000000006"/>
+            <column name="post_id" value="00000000-0000-0000-0002-000000000005"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000004"/>
+            <column name="text" value="Try a used Manfrotto, never fails me."/>
+            <column name="created_at" valueComputed="now() - interval '1 day 18 hours'"/>
+        </insert>
+        <insert tableName="comment">
+            <column name="id" value="00000000-0000-0000-0007-000000000007"/>
+            <column name="post_id" value="00000000-0000-0000-0002-000000000006"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000008"/>
+            <column name="text" value="Count me in!"/>
+            <column name="created_at" valueComputed="now() - interval '1 day'"/>
+        </insert>
+        <insert tableName="comment">
+            <column name="id" value="00000000-0000-0000-0007-000000000008"/>
+            <column name="post_id" value="00000000-0000-0000-0002-000000000007"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000006"/>
+            <column name="text" value="Those eyelashes though."/>
+            <column name="created_at" valueComputed="now() - interval '3 days 20 hours'"/>
+        </insert>
+        <insert tableName="comment">
+            <column name="id" value="00000000-0000-0000-0007-000000000009"/>
+            <column name="post_id" value="00000000-0000-0000-0002-000000000008"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000009"/>
+            <column name="text" value="This app's mascot approves."/>
+            <column name="created_at" valueComputed="now() - interval '4 days 20 hours'"/>
+        </insert>
+        <insert tableName="comment">
+            <column name="id" value="00000000-0000-0000-0007-000000000010"/>
+            <column name="post_id" value="00000000-0000-0000-0002-000000000009"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000007"/>
+            <column name="text" value="That hill at the end is brutal, good pace though."/>
+            <column name="created_at" valueComputed="now() - interval '3 days 2 hours'"/>
+        </insert>
+        <insert tableName="comment">
+            <column name="id" value="00000000-0000-0000-0007-000000000011"/>
+            <column name="post_id" value="00000000-0000-0000-0002-000000000010"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000007"/>
+            <column name="text" value="Tiny model, big attitude."/>
+            <column name="created_at" valueComputed="now() - interval '5 days 20 hours'"/>
+        </insert>
+        <insert tableName="comment">
+            <column name="id" value="00000000-0000-0000-0007-000000000012"/>
+            <column name="post_id" value="00000000-0000-0000-0002-000000000011"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="text" value="Adding this to my list."/>
+            <column name="created_at" valueComputed="now() - interval '6 days 18 hours'"/>
+        </insert>
+        <insert tableName="comment">
+            <column name="id" value="00000000-0000-0000-0007-000000000013"/>
+            <column name="post_id" value="00000000-0000-0000-0002-000000000012"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000008"/>
+            <column name="text" value="Wish I was there."/>
+            <column name="created_at" valueComputed="now() - interval '8 days 20 hours'"/>
+        </insert>
+        <insert tableName="comment">
+            <column name="id" value="00000000-0000-0000-0007-000000000014"/>
+            <column name="post_id" value="00000000-0000-0000-0002-000000000013"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000002"/>
+            <column name="text" value="That road looks brutal in the best way."/>
+            <column name="created_at" valueComputed="now() - interval '4 days 4 hours'"/>
+        </insert>
+        <insert tableName="comment">
+            <column name="id" value="00000000-0000-0000-0007-000000000015"/>
+            <column name="post_id" value="00000000-0000-0000-0002-000000000014"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000005"/>
+            <column name="text" value="This looks so peaceful."/>
+            <column name="created_at" valueComputed="now() - interval '7 days 18 hours'"/>
+        </insert>
+        <insert tableName="comment">
+            <column name="id" value="00000000-0000-0000-0007-000000000016"/>
+            <column name="post_id" value="00000000-0000-0000-0002-000000000015"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000003"/>
+            <column name="text" value="Same energy as my coffee corner."/>
+            <column name="created_at" valueComputed="now() - interval '2 days 22 hours'"/>
+        </insert>
+        <insert tableName="comment">
+            <column name="id" value="00000000-0000-0000-0007-000000000017"/>
+            <column name="post_id" value="00000000-0000-0000-0002-000000000016"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000009"/>
+            <column name="text" value="Majestic traffic jam."/>
+            <column name="created_at" valueComputed="now() - interval '5 days 2 hours'"/>
+        </insert>
+        <insert tableName="comment">
+            <column name="id" value="00000000-0000-0000-0007-000000000018"/>
+            <column name="post_id" value="00000000-0000-0000-0002-000000000017"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000010"/>
+            <column name="text" value="Look at that hair."/>
+            <column name="created_at" valueComputed="now() - interval '9 days 20 hours'"/>
+        </insert>
+        <insert tableName="comment">
+            <column name="id" value="00000000-0000-0000-0007-000000000019"/>
+            <column name="post_id" value="00000000-0000-0000-0002-000000000018"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000006"/>
+            <column name="text" value="Mood."/>
+            <column name="created_at" valueComputed="now() - interval '6 days 4 hours'"/>
+        </insert>
+        <insert tableName="comment">
+            <column name="id" value="00000000-0000-0000-0007-000000000020"/>
+            <column name="post_id" value="00000000-0000-0000-0002-000000000019"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000007"/>
+            <column name="text" value="That whisker game is strong."/>
+            <column name="created_at" valueComputed="now() - interval '10 days 18 hours'"/>
+        </insert>
+        <insert tableName="comment">
+            <column name="id" value="00000000-0000-0000-0007-000000000021"/>
+            <column name="post_id" value="00000000-0000-0000-0002-000000000020"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000004"/>
+            <column name="text" value="Next trip, I'm in."/>
+            <column name="created_at" valueComputed="now() - interval '11 days 20 hours'"/>
+        </insert>
+        <insert tableName="comment">
+            <column name="id" value="00000000-0000-0000-0007-000000000022"/>
+            <column name="post_id" value="00000000-0000-0000-0002-000000000021"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000002"/>
+            <column name="text" value="Respect the barefoot commitment."/>
+            <column name="created_at" valueComputed="now() - interval '12 days 18 hours'"/>
+        </insert>
     </changeSet>
 
     <!-- post_like: liked/upvoted/interested w mocku są viewer-relative względem
          CURRENT_USER (John Davis) - wiersze dla Johna muszą dokładnie odpowiadać
          flagom z mocka. Mock: p1/p2 liked:false, gp1/gp3/gp4 liked:false, gp2
-         liked:true -> John lajkuje tylko gp2. Inne wiersze (Jamal/Solomon na p1)
-         to dodatkowy, niezależny ruch społeczności, nie wpływający na flagę Johna. -->
+         liked:true -> John lajkuje tylko gp2. Inne wiersze (Jamal/Solomon na p1,
+         plus trochę ruchu na nowych postach) to dodatkowy, niezależny ruch
+         społeczności, nie wpływający na flagę Johna. -->
     <changeSet id="seed-003-post-likes" author="robert.sereda" context="seed">
         <insert tableName="post_like">
             <column name="post_id" value="00000000-0000-0000-0002-000000000001"/>
@@ -94,11 +330,26 @@
             <column name="user_id" value="00000000-0000-0000-0001-000000000003"/>
             <column name="created_at" valueComputed="now() - interval '1 day 21 hours'"/>
         </insert>
-        <!-- gp2 (Golden hour in the city) - liked:true w mocku dla CURRENT_USER. -->
+        <!-- gp2 (Golden hour / sunrise run) - liked:true w mocku dla CURRENT_USER. -->
         <insert tableName="post_like">
             <column name="post_id" value="00000000-0000-0000-0002-000000000004"/>
             <column name="user_id" value="00000000-0000-0000-0001-000000000001"/>
             <column name="created_at" valueComputed="now() - interval '2 days'"/>
+        </insert>
+        <insert tableName="post_like">
+            <column name="post_id" value="00000000-0000-0000-0002-000000000008"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="created_at" valueComputed="now() - interval '4 days 20 hours'"/>
+        </insert>
+        <insert tableName="post_like">
+            <column name="post_id" value="00000000-0000-0000-0002-000000000011"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="created_at" valueComputed="now() - interval '6 days 18 hours'"/>
+        </insert>
+        <insert tableName="post_like">
+            <column name="post_id" value="00000000-0000-0000-0002-000000000018"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000005"/>
+            <column name="created_at" valueComputed="now() - interval '6 days 10 hours'"/>
         </insert>
     </changeSet>
 
@@ -115,6 +366,16 @@
             <column name="post_id" value="00000000-0000-0000-0002-000000000003"/>
             <column name="user_id" value="00000000-0000-0000-0001-000000000005"/>
             <column name="created_at" valueComputed="now() - interval '2 days 23 hours'"/>
+        </insert>
+        <insert tableName="post_upvote">
+            <column name="post_id" value="00000000-0000-0000-0002-000000000016"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000003"/>
+            <column name="created_at" valueComputed="now() - interval '5 days 4 hours'"/>
+        </insert>
+        <insert tableName="post_upvote">
+            <column name="post_id" value="00000000-0000-0000-0002-000000000020"/>
+            <column name="user_id" value="00000000-0000-0000-0001-000000000006"/>
+            <column name="created_at" valueComputed="now() - interval '11 days 22 hours'"/>
         </insert>
     </changeSet>
 

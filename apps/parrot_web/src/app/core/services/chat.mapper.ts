@@ -9,12 +9,14 @@ export function toLocalChatMessage(dto: ChatMessageDto): ChatMessage {
     id: dto.id,
     fromMe: dto.fromMe,
     text: dto.text,
+    imageUrl: dto.image?.url,
   };
 }
 
 export function toLocalConversation(dto: ConversationDto): Conversation {
   return {
     id: dto.id,
+    contactId: dto.contactId,
     contactName: dto.contactName,
     contactAvatarUrl: dto.contactAvatar?.url ?? FALLBACK_AVATAR,
     messages: dto.messages.map(toLocalChatMessage),

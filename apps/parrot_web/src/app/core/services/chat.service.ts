@@ -20,15 +20,22 @@ export class ChatService {
     this.conversations.set(dtos.map(toLocalConversation));
   }
 
-  async sendMessage(conversationId: string, text: string): Promise<boolean> {
+  async sendMessage(
+    conversationId: string,
+    text: string,
+    imageAttachHandle?: string,
+  ): Promise<boolean> {
     const trimmed = text.trim();
-    if (!trimmed || !conversationId) {
+    if ((!trimmed && !imageAttachHandle) || !conversationId) {
       return false;
     }
+    // Backend requires non-blank text; an image sent without a caption gets a default one.
+    const effectiveText = trimmed || 'Photo';
     try {
       const dto = await firstValueFrom(
         this.http.post<ChatMessageDto>(`${this.baseUrl}/conversations/${conversationId}/messages`, {
-          text: trimmed,
+          text: effectiveText,
+          ...(imageAttachHandle ? { imageAttachHandle } : {}),
         }),
       );
       this.conversations.update((conversations) =>

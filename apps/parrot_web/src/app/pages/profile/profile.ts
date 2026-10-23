@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { FeedService } from '../../core/services/feed.service';
+import { MediaUploadService } from '../../core/services/media-upload.service';
 import { ProfileService } from '../../core/services/profile.service';
 import { Post } from '../../core/models/post.model';
 import { UserProfile } from '../../core/models/user.model';
@@ -33,6 +34,7 @@ import { map } from 'rxjs';
 export class Profile {
   readonly auth = inject(AuthService);
   readonly feed = inject(FeedService);
+  private readonly mediaUpload = inject(MediaUploadService);
   private readonly profileService = inject(ProfileService);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
@@ -42,6 +44,8 @@ export class Profile {
 
   readonly profile = signal<UserProfile | null>(null);
   readonly posts = signal<Post[]>([]);
+  readonly avatarUploading = signal(false);
+  readonly coverUploading = signal(false);
 
   private readonly routeId = toSignal(this.route.paramMap.pipe(map((params) => params.get('id'))), {
     initialValue: null,
@@ -116,5 +120,34 @@ export class Profile {
 
   private applyPost(post: Post): void {
     this.posts.update((posts) => posts.map((p) => (p.id === post.id ? post : p)));
+  }
+
+  async onAvatarSelected(event: Event): Promise<void> {
+    await this.uploadProfileImage(event, 'avatar');
+  }
+
+  async onCoverSelected(event: Event): Promise<void> {
+    await this.uploadProfileImage(event, 'cover');
+  }
+
+  private async uploadProfileImage(event: Event, slot: 'avatar' | 'cover'): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file || !this.isOwnProfile()) return;
+
+    const uploadingSignal = slot === 'avatar' ? this.avatarUploading : this.coverUploading;
+    uploadingSignal.set(true);
+    try {
+      const media = await this.mediaUpload.upload(file);
+      await this.auth.updateProfile(
+        slot === 'avatar'
+          ? { avatarAttachHandle: media.attachHandle }
+          : { coverAttachHandle: media.attachHandle },
+      );
+      this.profile.set(this.auth.currentUser());
+    } finally {
+      uploadingSignal.set(false);
+    }
   }
 }

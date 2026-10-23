@@ -24,12 +24,32 @@
       <header class="conversation-header">{{ conversation.contactName }}</header>
       <div class="messages">
         @for (message of conversation.messages; track message.id) {
-          <p class="bubble" [class.mine]="message.fromMe">{{ message.text }}</p>
+          <div class="bubble" [class.mine]="message.fromMe">
+            @if (message.imageUrl) {
+              <img class="bubble-image" [src]="message.imageUrl" alt="" />
+            }
+            @if (message.text) {
+              <p>{{ message.text }}</p>
+            }
+          </div>
         }
         @if (!conversation.messages.length) {
           <p class="empty">No messages yet. Say hello!</p>
         }
       </div>
+      @if (attachedImagePreviewUrl(); as preview) {
+        <div class="attachment-preview">
+          <img [src]="preview" alt="" />
+          <button
+            type="button"
+            class="btn btn-icon"
+            (click)="clearAttachedImage()"
+            aria-label="Remove attachment"
+          >
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+      }
       <div class="message-input">
         <input
           class="input"
@@ -38,6 +58,22 @@
           [(ngModel)]="messageText"
           (keyup.enter)="send()"
         />
+        <input
+          #imageInput
+          type="file"
+          accept="image/*"
+          class="visually-hidden"
+          (change)="onImageSelected($event)"
+        />
+        <button
+          type="button"
+          class="btn btn-icon"
+          [disabled]="attaching()"
+          (click)="imageInput.click()"
+          aria-label="Attach image"
+        >
+          <span class="material-symbols-outlined">image</span>
+        </button>
         <button type="button" class="btn btn-icon" (click)="send()" aria-label="Send">
           <span class="material-symbols-outlined">send</span>
         </button>

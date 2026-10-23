@@ -151,6 +151,19 @@
   font-weight: 600;
 }
 
+.friend-list li a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.friend-list li a span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .content {
   min-width: 0;
 }

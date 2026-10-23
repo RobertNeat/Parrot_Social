@@ -2,8 +2,48 @@
   <div class="profile-layout">
     <section class="profile-main">
       <div class="cover panel" [style.backgroundImage]="'url(' + profile.coverUrl + ')'">
+        @if (isOwnProfile()) {
+          <button
+            type="button"
+            class="cover-edit-btn"
+            aria-label="Change cover photo"
+            [disabled]="coverUploading()"
+            (click)="coverInput.click()"
+          >
+            <span class="material-symbols-outlined">photo_camera</span>
+            <span>{{ coverUploading() ? 'Uploading…' : 'Change cover photo' }}</span>
+          </button>
+          <input
+            #coverInput
+            type="file"
+            accept="image/*"
+            class="visually-hidden"
+            (change)="onCoverSelected($event)"
+          />
+        }
         <div class="cover-overlay">
-          <img class="avatar cover-avatar" [src]="profile.avatarUrl" [alt]="profile.firstName" />
+          <button
+            type="button"
+            class="avatar-btn"
+            [class.clickable]="isOwnProfile()"
+            [disabled]="!isOwnProfile() || avatarUploading()"
+            (click)="avatarInput.click()"
+            aria-label="Change profile photo"
+          >
+            <img class="avatar cover-avatar" [src]="profile.avatarUrl" [alt]="profile.firstName" />
+            @if (isOwnProfile()) {
+              <span class="avatar-edit-icon material-symbols-outlined">photo_camera</span>
+            }
+          </button>
+          @if (isOwnProfile()) {
+            <input
+              #avatarInput
+              type="file"
+              accept="image/*"
+              class="visually-hidden"
+              (change)="onAvatarSelected($event)"
+            />
+          }
           <div class="cover-text">
             <h1>{{ profile.firstName }} {{ profile.lastName }}</h1>
             <p>{{ profile.bio }}</p>
