@@ -15,6 +15,10 @@
 #
 # Media: pliki wgrywane przez użytkowników żyją w odrębnym wolumenie `parrot-media`
 # (/data w parrot-api) - baza przechowuje tylko metadane (tabela `media`).
+# Seed media: deploy_compose_ssh.sh kopiuje liquibase/ (więc też liquibase/seed/media)
+# na serwer - bind mount poniżej + PARROT_SEED_MEDIA_DIR udostępnia te pliki jako
+# fallback w MediaStorageService, żeby seed (context "seed") działał też na
+# produkcji, nie tylko lokalnie.
 name: parrot-social
 
 services:
@@ -73,9 +77,11 @@ services:
       PARROT_WEB_ORIGIN: ${PARROT_WEB_ORIGIN:-http://localhost:10700}
       PARROT_API_PUBLIC_ORIGIN: ${PARROT_API_PUBLIC_ORIGIN:-http://localhost:10710}
       PARROT_MEDIA_DIR: /data/media
+      PARROT_SEED_MEDIA_DIR: /seed-media
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required in config.env}
     volumes:
       - parrot-media:/data
+      - ./liquibase/seed/media:/seed-media:ro
     depends_on:
       liquibase:
         condition: service_completed_successfully
@@ -88,7 +94,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "wget -q -O /dev/null http://127.0.0.1:${PARROT_API_CONTAINER_PORT:-10710}/ || exit 1"
+          "wget -q -O /dev/null http://127.0.0.1:${PARROT_API_CONTAINER_PORT:-10710}/ || exit 1",
         ]
       interval: 10s
       timeout: 5s
@@ -104,7 +110,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "wget -q -O /dev/null http://127.0.0.1:${PARROT_WEB_CONTAINER_PORT:-10700}/ || exit 1"
+          "wget -q -O /dev/null http://127.0.0.1:${PARROT_WEB_CONTAINER_PORT:-10700}/ || exit 1",
         ]
       interval: 10s
       timeout: 5s

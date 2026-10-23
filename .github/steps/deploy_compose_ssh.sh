@@ -33,7 +33,13 @@ ssh -o BatchMode=yes "$remote" "mkdir -p -- $remote_dir_q"
 scp "$COMPOSE_FILE" "$remote:$REMOTE_DIR/compose.yml"
 liquibase_dir="$(dirname "$COMPOSE_FILE")/liquibase"
 if [ -d "$liquibase_dir" ]; then
-  scp -r "$liquibase_dir" "$remote:$REMOTE_DIR/liquibase"
+  # Kopiowanie DO katalogu nadrzędnego (nie "...:$REMOTE_DIR/liquibase") - scp -r
+  # na istniejący cel kopiowałby DO niego (jak cp -r), więc przy kolejnych
+  # deployach powstałoby zagnieżdżenie liquibase/liquibase/... i changelog/seed/media
+  # zostałyby zamrożone na stanie z pierwszego deploya. Nie usuwamy zdalnego
+  # katalogu przed kopiowaniem - parrot-api bind-mountuje liquibase/seed/media,
+  # a usunięcie i odtworzenie katalogu odłączyłoby już uruchomiony bind mount.
+  scp -r "$liquibase_dir" "$remote:${REMOTE_DIR%/}/"
 fi
 if ssh -o BatchMode=yes "$remote" "test -f $remote_config_file_q"; then
   echo "Keeping existing remote config.env at $remote_config_file"

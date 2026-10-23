@@ -38,8 +38,9 @@ export interface StoredMediaMeta {
 }
 
 // Checked in order; first directory that actually contains the file wins. PARROT_MEDIA_DIR is the
-// real uploads volume (written by saveUpload below); PARROT_SEED_MEDIA_DIR is the dev-only bind
-// mount of deploy/liquibase/seed/media (see deploy/compose.dev.yml).
+// real uploads volume (written by saveUpload below); PARROT_SEED_MEDIA_DIR is the read-only bind
+// mount of deploy/liquibase/seed/media (see deploy/compose.yml) used when the "seed" Liquibase
+// context is active, in dev and in production alike.
 function candidateMediaDirs(): string[] {
   return [
     process.env.PARROT_MEDIA_DIR,

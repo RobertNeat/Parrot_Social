@@ -30,12 +30,8 @@ services:
         BUILD_OUTPUT: dist
         START_COMMAND: node dist/main.js
         APP_PORT: "10710"
-    environment:
-      # Dev/seed-only: pliki spod deploy/liquibase/seed/media (avatary i obrazki postów z seed
-      # danych) - PARROT_MEDIA_DIR (realny wolumen uploadów) ma priorytet, to tylko fallback.
-      PARROT_SEED_MEDIA_DIR: /seed-media
-    volumes:
-      - ../deploy/liquibase/seed/media:/seed-media:ro
+    # PARROT_SEED_MEDIA_DIR + bind mount seed media są teraz w compose.yml
+    # (kanoniczne, działa też na produkcji) - tu tylko nakładka portów.
     ports: !override
       - "127.0.0.1:${PARROT_API_HOST_PORT:-10710}:${PARROT_API_CONTAINER_PORT:-10710}"
 

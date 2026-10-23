@@ -5,8 +5,9 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <!-- Realne pliki PNG w deploy/liquibase/seed/media/ (zob. deploy/compose.dev.yml -
-         bind mount do /seed-media w parrot-api, PARROT_SEED_MEDIA_DIR). Nadpisuje
+    <!-- Realne pliki PNG w deploy/liquibase/seed/media/ (zob. deploy/compose.yml -
+         bind mount do /seed-media w parrot-api, PARROT_SEED_MEDIA_DIR; działa też na
+         produkcji, nie tylko lokalnie). Nadpisuje
          wcześniejszą decyzję z 001-seed-users.xml/003-seed-posts.xml ("avatar_media_id/
          image_media_id zostają NULL, bo plik nie istnieje w wolumenie") - te pliki
          teraz istnieją, więc dopinamy media + avatar/image FK w kolejnych changesetach

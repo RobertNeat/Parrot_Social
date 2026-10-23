@@ -6,12 +6,37 @@
     </div>
 
     <form class="form-col" [formGroup]="form" (ngSubmit)="submit()">
-      <input
-        class="input"
-        type="text"
-        placeholder="email or username"
-        formControlName="identifier"
-      />
+      <div class="identifier-row">
+        <input
+          class="input"
+          type="text"
+          placeholder="email or username"
+          formControlName="identifier"
+        />
+        <button
+          type="button"
+          class="demo-accounts-toggle"
+          title="Demo accounts"
+          aria-label="Show demo accounts"
+          [attr.aria-expanded]="demoAccountsOpen()"
+          (click)="toggleDemoAccounts()"
+        >
+          i
+        </button>
+
+        @if (demoAccountsOpen()) {
+          <ul class="demo-accounts-popover">
+            @for (account of demoAccounts; track account.identifier) {
+              <li>
+                <button type="button" (click)="fillDemoAccount(account)">
+                  {{ account.label }}
+                  <span class="demo-account-identifier">{{ account.identifier }}</span>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </div>
       @if (submitted() && form.controls.identifier.invalid) {
         <span class="field-error">Email or username is required.</span>
       }
