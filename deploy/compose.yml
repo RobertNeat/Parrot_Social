@@ -43,7 +43,10 @@ services:
       - parrot-internal
 
   liquibase:
-    image: 192.168.1.162:5000/liquibase/liquibase:4.33-alpine
+    # Bezpośrednio z Docker Hub (nie przez lokalny mirror ZOT) - sync ZOT
+    # obejmuje tylko prefix "library/**", a "liquibase/liquibase" nie jest
+    # official image, więc ZOT zwraca "not found" (zweryfikowane).
+    image: liquibase/liquibase:4.33-alpine
     restart: "no"
     depends_on:
       postgres:
