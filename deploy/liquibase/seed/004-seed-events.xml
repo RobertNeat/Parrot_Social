@@ -9,7 +9,9 @@
          uzasadnienie w 003-seed-posts.xml). interestedCount z mocka nie jest
          odwzorowywane 1:1 - backend liczy COUNT(*) z event_interest; seedujemy
          pojedyncze wiersze interested dla CURRENT_USER na eventach, które w mocku
-         mają interested:true (e1, e3, e6). -->
+         mają interested:true (e1, e3, e6). created_by wymagane od 011-event-organizer.xml
+         (NOT NULL) - na świeżej bazie ten seed uruchamia się PO tamtym changelogu,
+         więc backfill go nie obejmuje; organizatorzy przypisani rotacyjnie z userów seeda. -->
     <changeSet id="seed-004-events" author="robert.sereda" context="seed">
         <insert tableName="event">
             <column name="id" value="00000000-0000-0000-0004-000000000001"/>
@@ -17,6 +19,7 @@
             <column name="description" value="Join us for an elegant evening of giving, where we'll come together to raise funds for local charities. Enjoy a night of fine dining, live entertainment, and philanthropy."/>
             <column name="starts_at" valueComputed="now() + interval '5 days'"/>
             <column name="created_at" valueComputed="now() - interval '10 days'"/>
+            <column name="created_by" value="00000000-0000-0000-0001-000000000001"/>
         </insert>
         <insert tableName="event">
             <column name="id" value="00000000-0000-0000-0004-000000000002"/>
@@ -24,6 +27,7 @@
             <column name="description" value="Calling all tech enthusiasts! Connect with industry leaders, share ideas, and stay ahead of the curve at our Tech Innovators Meetup. Network with ..."/>
             <column name="starts_at" valueComputed="now() + interval '12 days'"/>
             <column name="created_at" valueComputed="now() - interval '9 days'"/>
+            <column name="created_by" value="00000000-0000-0000-0001-000000000002"/>
         </insert>
         <insert tableName="event">
             <column name="id" value="00000000-0000-0000-0004-000000000003"/>
@@ -31,6 +35,7 @@
             <column name="description" value="Celebrate diversity and cultural richness at our Cultural Fusion Festival. Experience a melting pot of traditions, music, dance, and cuisine from around ..."/>
             <column name="starts_at" valueComputed="now() + interval '20 days'"/>
             <column name="created_at" valueComputed="now() - interval '8 days'"/>
+            <column name="created_by" value="00000000-0000-0000-0001-000000000003"/>
         </insert>
         <insert tableName="event">
             <column name="id" value="00000000-0000-0000-0004-000000000004"/>
@@ -38,6 +43,7 @@
             <column name="description" value="A three-day celebration of live music across five stages, food trucks and art installations. Grab your friends and your dancing shoes."/>
             <column name="starts_at" valueComputed="now() + interval '30 days'"/>
             <column name="created_at" valueComputed="now() - interval '7 days'"/>
+            <column name="created_by" value="00000000-0000-0000-0001-000000000004"/>
         </insert>
         <insert tableName="event">
             <column name="id" value="00000000-0000-0000-0004-000000000005"/>
@@ -45,6 +51,7 @@
             <column name="description" value="An intimate club night featuring up-and-coming DJs spinning house and techno until sunrise."/>
             <column name="starts_at" valueComputed="now() + interval '15 days'"/>
             <column name="created_at" valueComputed="now() - interval '6 days'"/>
+            <column name="created_by" value="00000000-0000-0000-0001-000000000005"/>
         </insert>
         <insert tableName="event">
             <column name="id" value="00000000-0000-0000-0004-000000000006"/>
@@ -52,6 +59,7 @@
             <column name="description" value="Ring in the new year with the whole city - live music, food stalls and a spectacular fireworks show at midnight."/>
             <column name="starts_at" valueComputed="now() + interval '60 days'"/>
             <column name="created_at" valueComputed="now() - interval '5 days'"/>
+            <column name="created_by" value="00000000-0000-0000-0001-000000000006"/>
         </insert>
     </changeSet>
 

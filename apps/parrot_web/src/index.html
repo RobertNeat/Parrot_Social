@@ -16,6 +16,10 @@
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
       rel="stylesheet"
     />
+    <!-- Sets window.__env before the app bundle loads; nginx renders this from
+         PARROT_API_PUBLIC_ORIGIN at container start (see environment.prod.ts). Missing
+         in dev (ng serve has no nginx) - environment.prod.ts falls back to localhost. -->
+    <script src="env.js"></script>
   </head>
   <body>
     <app-root></app-root>

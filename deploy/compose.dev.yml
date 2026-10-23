@@ -1,7 +1,9 @@
 # Nakładka lokalna (tylko różnice deweloperskie względem compose.yml):
 #   pnpm --filter @parrot-social/parrot_web run build:dev  (wymagane przed --build, zob. parrot-web
 #   poniżej; `build` (bez :dev) buduje z configuration=production, czyli z environment.prod.ts -
-#   lokalny stos wołałby placeholder "parrotsocialapi" zamiast localhost:10710)
+#   ten sam zbudowany dist/ działa wtedy też w compose.dev.yml, bo apiUrl jest teraz
+#   wstrzykiwany w czasie startu kontenera przez nginx envsubst, nie zahardkodowany w
+#   buildzie; build:dev zostaje jako szybszy, nieoptymalizowany wariant deweloperski)
 #   docker compose -f deploy/compose.yml -f deploy/compose.dev.yml --env-file .env up -d --build
 # Budowanie odwzorowuje .github/steps/create_docker_image.sh (te same build-args).
 # Lokalne buildy (docker build, pnpm) używają tych samych lokalnych rejestrów
@@ -38,7 +40,8 @@ services:
   parrot-web:
     # Wymaga lokalnego builda przed `up --build`: pnpm --filter @parrot-social/parrot_web run build:dev
     # (unika pnpm install/supply-chain check w kontenerze - zob. angular.local.Dockerfile; build:dev
-    # = configuration development, inaczej dist/ wskazywałby na placeholder środowiska produkcyjnego).
+    # = configuration development, szybszy/nieoptymalizowany; apiUrl i tak jest wstrzykiwany
+    # w czasie startu kontenera, zob. komentarz u góry pliku).
     build:
       context: ../apps/parrot_web
       dockerfile: ../../.github/docker/angular.local.Dockerfile

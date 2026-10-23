@@ -107,6 +107,11 @@ services:
   parrot-web:
     image: ${REGISTRY:-local}/${PARROT_WEB_IMAGE:-parrot-social/parrot-web}:${IMAGE_TAG:-dev}
     restart: unless-stopped
+    environment:
+      # Rendered into /env.js at container start by nginx's envsubst-on-templates
+      # entrypoint (see apps/parrot_web/nginx.conf) - must be reachable from the
+      # browser, not a Docker-internal hostname.
+      PARROT_API_PUBLIC_ORIGIN: ${PARROT_API_PUBLIC_ORIGIN:-http://localhost:10710}
     ports:
       - "${PARROT_WEB_HOST_PORT:-10700}:${PARROT_WEB_CONTAINER_PORT:-10700}"
     healthcheck:

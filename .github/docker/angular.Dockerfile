@@ -28,5 +28,8 @@ ARG SERVER_CONFIG
 ARG PROJECT_PATH
 ARG APP_PORT
 COPY --from=build /workspace/${BUILD_OUTPUT} /usr/share/nginx/html
-COPY ${SERVER_CONFIG} /etc/nginx/conf.d/default.conf
+# templates/*.template -> conf.d/* via envsubst is the base image's own entrypoint
+# behavior (docker-entrypoint.d/20-envsubst-on-templates.sh) - lets env.js's
+# ${PARROT_API_PUBLIC_ORIGIN} resolve at container start (see nginx.conf).
+COPY ${SERVER_CONFIG} /etc/nginx/templates/default.conf.template
 EXPOSE ${APP_PORT}

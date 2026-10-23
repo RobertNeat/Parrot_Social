@@ -8,5 +8,7 @@ ARG BUILD_OUTPUT
 ARG SERVER_CONFIG
 ARG APP_PORT
 COPY ${BUILD_OUTPUT} /usr/share/nginx/html
-COPY ${SERVER_CONFIG} /etc/nginx/conf.d/default.conf
+# templates/*.template -> conf.d/* via envsubst is the base image's own entrypoint
+# behavior - lets env.js's ${PARROT_API_PUBLIC_ORIGIN} resolve at container start.
+COPY ${SERVER_CONFIG} /etc/nginx/templates/default.conf.template
 EXPOSE ${APP_PORT}
