@@ -8,6 +8,55 @@
 ParrotSocial to kompletna platforma społecznościowa łącząca ludzi wokół tego, co naprawdę się liczy — rozmów, wspomnień i wspólnych wydarzeń. Pozwala budować profil, dzielić się chwilami na tablicy, rozmawiać na czacie w czasie rzeczywistym, dołączać do grup zainteresowań i śledzić nadchodzące wydarzenia. Projekt powstał jako pełnoprawna aplikacja produkcyjna — od frontendu po infrastrukturę — z naciskiem na bezpieczeństwo, solidną architekturę i jakość kodu na poziomie, którego nie wstydziłby się żaden zespół komercyjny.
 </p>
 
+# Features
+
+- **Konto i logowanie** — rejestracja, logowanie (nazwą użytkownika lub e-mailem), bezpieczne wylogowanie oraz proces wdrożenia nowego użytkownika (onboarding) po pierwszym zalogowaniu.
+
+<p align="center">
+  <img src="/docs/media/login.png" alt="login" width="80%">
+</p>
+
+- **Profil użytkownika** — edycja danych osobowych (opis, praca, edukacja, status związku, lokalizacja), zmiana zdjęcia profilowego i zdjęcia w tle, przeglądanie profili innych osób wraz z ich aktywnością.
+
+<p align="center">
+  <img src="/docs/media/user_profile.png" alt="user profile" width="80%">
+</p>
+
+- **Tablica i posty** — publikowanie postów z tekstem i zdjęciem, usuwanie własnych wpisów, polubienia i głosy „upvote”, komentowanie wpisów innych użytkowników.
+
+<p align="center">
+  <img src="/docs/media/user_feed.png" alt="user feed" width="80%">
+</p>
+
+- **Znajomi i kontakty** — lista znajomych, zarządzanie kontaktami i relacjami między użytkownikami.
+
+<p align="center">
+  <img src="/docs/media/other_user_profile.png" alt="other user profile" width="80%">
+</p>
+
+- **Grupy** — przeglądanie i tworzenie grup zainteresowań, dołączanie i opuszczanie grup, własna tablica postów widoczna tylko dla członków grupy, lista uczestników.
+
+<p align="center">
+  <img src="/docs/media/group_feed.png" alt="group feed" width="80%">
+</p>
+
+- **Wydarzenia** — przeglądanie i tworzenie wydarzeń, oznaczanie zainteresowania udziałem oraz wycofywanie deklaracji.
+
+<p align="center">
+  <img src="/docs/media/events.png" alt="events" width="80%">
+</p>
+
+- **Czat w czasie rzeczywistym** — lista konwersacji, wysyłanie wiadomości tekstowych i ze zdjęciami, dostęp ograniczony wyłącznie do uczestników rozmowy.
+
+<p align="center">
+  <img src="/docs/media/chat.png" alt="chat" width="80%">
+</p>
+
+- **Powiadomienia** — lista aktywności dotyczących użytkownika oraz możliwość oznaczenia wszystkich powiadomień jako przeczytane.
+- **Wyszukiwanie** — szybkie znajdowanie osób, grup i wydarzeń w ramach platformy.
+- **Media** — bezpieczne przesyłanie i przechowywanie zdjęć (profilowych, w postach, w czacie) z ochroną przed nieautoryzowanym dostępem.
+- **Ustawienia konta** — zarządzanie danymi profilowymi i preferencjami konta w jednym miejscu.
+
 # Used technologies
 
 ### Bezpieczeństwo
@@ -56,63 +105,3 @@ ParrotSocial to kompletna platforma społecznościowa łącząca ludzi wokół t
 - **Statyczna analiza kodu (oxlint) i automatyczne formatowanie (Prettier)** — spójny, czytelny styl kodu w całym projekcie.
 - **TypeScript w trybie strict** w każdej części projektu — błędy w typach danych są wychwytywane zanim kod trafi na serwer.
 - **Jedna komenda weryfikująca jakość** (lint + typy + formatowanie + testy), używana identycznie lokalnie i w procesie CI — żadna zmiana nie trafia do produkcji bez przejścia tej samej bramki jakości.
-
-# Features
-
-- **Konto i logowanie** — rejestracja, logowanie (nazwą użytkownika lub e-mailem), bezpieczne wylogowanie oraz proces wdrożenia nowego użytkownika (onboarding) po pierwszym zalogowaniu.
-
-<p align="center">
-  <img src="/docs/media/login.png" alt="login" width="80%">
-  <img src="/docs/media/register.png" alt="register" width="80%">
-</p>
-
-- **Profil użytkownika** — edycja danych osobowych (opis, praca, edukacja, status związku, lokalizacja), zmiana zdjęcia profilowego i zdjęcia w tle, przeglądanie profili innych osób wraz z ich aktywnością.
-
-<p align="center">
-  <img src="/docs/media/user_profile.png" alt="user profile" width="80%">
-</p>
-
-- **Tablica i posty** — publikowanie postów z tekstem i zdjęciem, usuwanie własnych wpisów, polubienia i głosy „upvote”, komentowanie wpisów innych użytkowników.
-
-<p align="center">
-  <img src="/docs/media/user_feed.png" alt="user feed" width="80%">
-</p>
-
-- **Znajomi i kontakty** — lista znajomych, zarządzanie kontaktami i relacjami między użytkownikami.
-
-<p align="center">
-  <img src="/docs/media/other_user_profile.png" alt="other user profile" width="80%">
-</p>
-
-- **Grupy** — przeglądanie i tworzenie grup zainteresowań, dołączanie i opuszczanie grup, własna tablica postów widoczna tylko dla członków grupy, lista uczestników.
-
-<p align="center">
-  <img src="/docs/media/group_feed.png" alt="group feed" width="80%">
-</p>
-
-- **Wydarzenia** — przeglądanie i tworzenie wydarzeń, oznaczanie zainteresowania udziałem oraz wycofywanie deklaracji.
-
-<p align="center">
-  <img src="/docs/media/events.png" alt="events" width="80%">
-</p>
-
-- **Czat w czasie rzeczywistym** — lista konwersacji, wysyłanie wiadomości tekstowych i ze zdjęciami, dostęp ograniczony wyłącznie do uczestników rozmowy.
-
-<p align="center">
-  <img src="/docs/media/chat.png" alt="chat" width="80%">
-</p>
-
-- **Powiadomienia** — lista aktywności dotyczących użytkownika oraz możliwość oznaczenia wszystkich powiadomień jako przeczytane.
-- **Wyszukiwanie** — szybkie znajdowanie osób, grup i wydarzeń w ramach platformy.
-- **Media** — bezpieczne przesyłanie i przechowywanie zdjęć (profilowych, w postach, w czacie) z ochroną przed nieautoryzowanym dostępem.
-- **Ustawienia konta** — zarządzanie danymi profilowymi i preferencjami konta w jednym miejscu.
-
-# Project gallery
-
-- **Dołącz do społeczności** — zarejestruj się, uzupełnij swój profil i rozpocznij podróż w ParrotSocial.
-- **Dziel się chwilami** — publikuj posty, dodawaj zdjęcia i reaguj na treści przyjaciół poprzez polubienia i komentarze.
-- **Łącz się z ludźmi** — dodawaj znajomych, przeglądaj ich profile i buduj swoją sieć kontaktów.
-- **Rozmawiaj na żywo** — pisz wiadomości do przyjaciół na czacie, wysyłaj zdjęcia i bądź w stałym kontakcie.
-- **Twórz i dołączaj do grup** — znajdź społeczność wokół swoich zainteresowań i publikuj na tablicy grupy.
-- **Nie przegap żadnego wydarzenia** — przeglądaj nadchodzące wydarzenia i oznaczaj, w których chcesz wziąć udział.
-- **Bądź na bieżąco** — otrzymuj powiadomienia o aktywności dotyczącej Twojego konta.
