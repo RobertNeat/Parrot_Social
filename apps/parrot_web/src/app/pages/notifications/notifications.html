@@ -8,9 +8,30 @@
 
   <ul class="notification-list">
     @for (notification of notifications.notifications(); track notification.id) {
-      <li class="notification-item" [class.unread]="!notification.read">
+      <li
+        class="notification-item"
+        [class.unread]="!notification.read"
+        [class.clickable]="notification.actorId || notification.targetId"
+        (click)="open(notification)"
+      >
         <span class="material-symbols-outlined">{{ notification.icon }}</span>
         <span class="notification-text">{{ notification.text }}</span>
+        @if (notification.type === 'friend-request' && notification.friendshipStatus === 'pending') {
+          <div class="notification-actions">
+            <button type="button" class="btn btn-primary" (click)="accept(notification, $event)">
+              Accept
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-gradient"
+              (click)="decline(notification, $event)"
+            >
+              Decline
+            </button>
+          </div>
+        } @else if (notification.type === 'friend-request' && notification.friendshipStatus === 'accepted') {
+          <span class="badge">Accepted</span>
+        }
         <span class="time-ago">{{ notification.timeAgo }}</span>
       </li>
     }

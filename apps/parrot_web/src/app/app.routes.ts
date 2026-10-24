@@ -37,6 +37,10 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/events/events').then((m) => m.Events),
       },
       {
+        path: 'events/:id',
+        loadComponent: () => import('./pages/event-page/event-page').then((m) => m.EventPage),
+      },
+      {
         path: 'search',
         loadComponent: () => import('./pages/search/search').then((m) => m.Search),
       },
@@ -49,7 +53,8 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/groups/group-page').then((m) => m.GroupPage),
       },
       { path: 'chat', loadComponent: () => import('./pages/chat/chat').then((m) => m.Chat) },
-      { path: 'messages', loadComponent: () => import('./pages/chat/chat').then((m) => m.Chat) },
+      // Legacy alias kept for old bookmarks/links; "Messages" nav entry was a duplicate of "Chat" and was removed.
+      { path: 'messages', redirectTo: 'chat' },
       {
         path: 'notifications',
         loadComponent: () =>

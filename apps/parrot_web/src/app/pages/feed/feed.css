@@ -100,8 +100,22 @@
   white-space: nowrap;
 }
 
+.contact-row.active {
+  color: var(--primary-strong);
+}
+
 .mail-row {
   justify-content: flex-end;
+}
+
+.mail-row a {
+  display: flex;
+  color: inherit;
+}
+
+.empty {
+  color: var(--text-on-panel-muted);
+  font-weight: 400;
 }
 
 .mini-chat {

@@ -20,6 +20,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { MediaRefBuilderService } from '../media/media-ref-builder.service.js';
 import { MediaStorageService } from '../media/media-storage.service.js';
 import {
+  optionalString,
   optionalUuid,
   requireIsoDate,
   requireString,
@@ -64,6 +65,9 @@ export class EventsController {
       minLength: 1,
     });
     const startsAt = requireIsoDate(body.startsAt, 'startsAt');
+    const location = optionalString(body.location, 'location', {
+      maxLength: 255,
+    });
     const imageAttachHandle = optionalUuid(
       body.imageAttachHandle,
       'imageAttachHandle',
@@ -76,10 +80,22 @@ export class EventsController {
       title,
       description,
       startsAt,
+      location,
       imageMediaId,
       createdBy: organizerId,
     });
     return this.loadEventDto(eventId, organizerId, res);
+  }
+
+  @Get(':id')
+  async getById(
+    @Param('id') idRaw: string,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<EventDto> {
+    const id = requireUuid(idRaw, 'id');
+    const viewerId = userId(req);
+    return this.loadEventDto(id, viewerId, res);
   }
 
   @Post(':id/interested')

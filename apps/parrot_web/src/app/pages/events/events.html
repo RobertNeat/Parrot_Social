@@ -13,6 +13,7 @@
     <input class="input" type="text" placeholder="Title" [(ngModel)]="title" />
     <textarea class="input" rows="3" placeholder="Description" [(ngModel)]="description"></textarea>
     <input class="input" type="datetime-local" [(ngModel)]="startsAt" />
+    <input class="input" type="text" placeholder="Location (optional)" [(ngModel)]="location" />
     <input class="input" type="file" accept="image/*" (change)="onImageSelected($event)" />
     @if (error()) {
       <p class="form-error">{{ error() }}</p>
@@ -33,23 +34,35 @@
 
 <div class="events-grid">
   @for (event of eventsService.events(); track event.id) {
-    <article class="event-card panel">
-      <img class="event-image" [src]="event.imageUrl" [alt]="event.title" />
+    <a class="event-card panel" [routerLink]="['/events', event.id]">
+      @if (event.imageUrl) {
+        <img class="event-image" [src]="event.imageUrl" [alt]="event.title" />
+      } @else {
+        <div class="event-image-placeholder">
+          <span class="material-symbols-outlined">event</span>
+        </div>
+      }
       <h3>{{ event.title }}</h3>
       <p class="event-desc">{{ event.description }}</p>
+      @if (event.location) {
+        <p class="event-location">
+          <span class="material-symbols-outlined">location_on</span>
+          {{ event.location }}
+        </p>
+      }
       <p class="interested-count">{{ event.interestedCount }} people interested</p>
       <button
         type="button"
         class="btn interest-btn"
         [class.btn-primary]="event.interested"
         [class.btn-outline-gradient]="!event.interested"
-        (click)="toggle(event.id)"
+        (click)="toggle(event.id, $event)"
       >
         <span class="material-symbols-outlined">{{
           event.interested ? 'check_circle' : 'cancel'
         }}</span>
         {{ event.interested ? 'Interested' : 'Uninterested' }}
       </button>
-    </article>
+    </a>
   }
 </div>

@@ -88,6 +88,7 @@
 
 .empty {
   color: var(--text-on-panel-muted);
+  padding: 8px;
 }
 
 .visually-hidden {

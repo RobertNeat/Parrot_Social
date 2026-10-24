@@ -9,6 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { FeedService } from '../../core/services/feed.service';
 import { ChatService } from '../../core/services/chat.service';
@@ -24,7 +25,7 @@ import {
 
 @Component({
   selector: 'app-feed',
-  imports: [FormsModule, PostCard],
+  imports: [FormsModule, RouterLink, PostCard],
   templateUrl: './feed.html',
   styleUrl: './feed.css',
 })
@@ -73,6 +74,11 @@ export class Feed {
     if (conversation) {
       this.activeConversationId.set(conversation.id);
     }
+  }
+
+  isActiveContact(contactId: string): boolean {
+    const active = this.activeConversation();
+    return active?.contactId === contactId;
   }
 
   activeConversation() {

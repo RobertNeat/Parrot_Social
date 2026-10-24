@@ -32,7 +32,9 @@
 <div class="groups-grid">
   @for (group of groupsService.groups(); track group.id) {
     <a class="group-card panel" [routerLink]="['/groups', group.id]">
-      <div class="group-avatar"></div>
+      <div class="group-avatar">
+        <span class="material-symbols-outlined">groups</span>
+      </div>
       <div class="group-info">
         <h3>{{ group.name }}</h3>
         <p>{{ group.description }}</p>

@@ -5,16 +5,16 @@ import type { CreateEventRequestDto, EventDto } from '@parrot-social/shared-dto'
 import { environment } from '../../../environments/environment';
 import { EventItem } from '../models/event.model';
 
-// No seed event currently has a real image_media_id - this is a genuine "no image" fallback,
-// not seed-data variety (unlike avatar/post media), so a single static placeholder is enough.
-const FALLBACK_EVENT_IMAGE = 'resources/event/event_1.png';
-
 function toLocalEvent(dto: EventDto): EventItem {
   return {
     id: dto.id,
     title: dto.title,
     description: dto.description,
-    imageUrl: dto.image?.url ?? FALLBACK_EVENT_IMAGE,
+    imageUrl: dto.image?.url,
+    startsAt: dto.startsAt,
+    location: dto.location,
+    organizerId: dto.organizerId,
+    organizerName: dto.organizerName,
     interestedCount: dto.interestedCount,
     interested: dto.interested,
   };
@@ -30,6 +30,28 @@ export class EventsService {
   async load(): Promise<void> {
     const dtos = await firstValueFrom(this.http.get<EventDto[]>(this.baseUrl));
     this.events.set(dtos.map(toLocalEvent));
+  }
+
+  getEvent(id: string): EventItem | undefined {
+    return this.events().find((event) => event.id === id);
+  }
+
+  /** Loads a single event's full detail directly from the backend - used by the event-detail
+   * page so it works even without the list having been loaded first (e.g. direct navigation,
+   * or a page refresh on /events/:id). */
+  async loadEvent(id: string): Promise<EventItem | null> {
+    try {
+      const dto = await firstValueFrom(this.http.get<EventDto>(`${this.baseUrl}/${id}`));
+      const event = toLocalEvent(dto);
+      this.events.update((events) =>
+        events.some((e) => e.id === event.id)
+          ? events.map((e) => (e.id === event.id ? event : e))
+          : [...events, event],
+      );
+      return event;
+    } catch {
+      return null;
+    }
   }
 
   /** Returns true on success so the caller can clear/close its form. */

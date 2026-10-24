@@ -17,6 +17,9 @@ export function distributeRoundRobin<T>(items: readonly T[], columnCount: number
 /**
  * Keeps `columnCount` in sync with how many `columnWidth`-wide columns fit in
  * `container`, updating on resize. Used to drive a round-robin masonry layout.
+ * Returns a cleanup function that disconnects the observer - callers whose
+ * container can be torn down and recreated (e.g. behind an `@if`) must call it
+ * before re-invoking with a new container, so a stale observer never lingers.
  */
 export function watchColumnCount(
   container: ElementRef<HTMLElement>,
@@ -24,7 +27,7 @@ export function watchColumnCount(
   destroyRef: DestroyRef,
   columnWidth: number,
   gap: number,
-): void {
+): () => void {
   const element = container.nativeElement;
   const compute = (width: number) => Math.max(1, Math.floor((width + gap) / (columnWidth + gap)));
 
@@ -34,5 +37,7 @@ export function watchColumnCount(
     columnCount.set(compute(entry.contentRect.width));
   });
   observer.observe(element);
-  destroyRef.onDestroy(() => observer.disconnect());
+  const cleanup = () => observer.disconnect();
+  destroyRef.onDestroy(cleanup);
+  return cleanup;
 }

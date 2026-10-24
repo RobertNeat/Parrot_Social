@@ -28,7 +28,7 @@
     <aside class="group-side panel">
       <h3>Owner:</h3>
       <ul class="owner-list">
-        <li>{{ group.ownerName }}</li>
+        <li><a [routerLink]="['/profile', group.ownerId]">{{ group.ownerName }}</a></li>
       </ul>
 
       <button
@@ -46,8 +46,8 @@
 
       <h3>Members:</h3>
       <ul class="member-list">
-        @for (member of group.members; track member) {
-          <li>{{ member }},</li>
+        @for (member of group.members; track member.id) {
+          <li><a [routerLink]="['/profile', member.id]">{{ member.name }}</a>,</li>
         }
       </ul>
     </aside>

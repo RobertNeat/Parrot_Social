@@ -47,7 +47,16 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--panel-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-on-panel-muted);
+  flex-shrink: 0;
+}
+
+.group-avatar .material-symbols-outlined {
+  font-size: 28px;
 }
 
 .group-info h3 {

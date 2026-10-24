@@ -14,6 +14,9 @@ export async function toEventDto(
     description: row.description,
     image: await mediaRefBuilder.buildRefForMediaId(row.image_media_id, res),
     startsAt: row.starts_at.toISOString(),
+    location: row.location,
+    organizerId: row.created_by,
+    organizerName: `${row.organizer_first_name} ${row.organizer_last_name}`,
     interestedCount: row.interested_count,
     interested: row.interested,
   };

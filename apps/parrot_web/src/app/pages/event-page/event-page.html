@@ -1,0 +1,52 @@
+@if (event(); as event) {
+  <div class="event-layout">
+    @if (event.imageUrl) {
+      <img class="event-image" [src]="event.imageUrl" [alt]="event.title" />
+    } @else {
+      <div class="event-image-placeholder">
+        <span class="material-symbols-outlined">event</span>
+      </div>
+    }
+
+    <div class="event-main panel">
+      <h1>{{ event.title }}</h1>
+
+      <p class="event-meta">
+        <span class="material-symbols-outlined">event</span>
+        {{ event.startsAt | date: 'medium' }}
+      </p>
+
+      @if (event.location) {
+        <p class="event-meta">
+          <span class="material-symbols-outlined">location_on</span>
+          {{ event.location }}
+        </p>
+      }
+
+      <p class="event-meta">
+        <span class="material-symbols-outlined">person</span>
+        Organized by
+        <a [routerLink]="['/profile', event.organizerId]">{{ event.organizerName }}</a>
+      </p>
+
+      <p class="event-description">{{ event.description }}</p>
+
+      <p class="interested-count">{{ event.interestedCount }} people interested</p>
+
+      <button
+        type="button"
+        class="btn interest-btn"
+        [class.btn-primary]="event.interested"
+        [class.btn-outline-gradient]="!event.interested"
+        (click)="toggle()"
+      >
+        <span class="material-symbols-outlined">{{
+          event.interested ? 'check_circle' : 'cancel'
+        }}</span>
+        {{ event.interested ? 'Interested' : 'Uninterested' }}
+      </button>
+    </div>
+  </div>
+} @else {
+  <p class="not-found">Event not found. <a routerLink="/events">Back to events</a></p>
+}

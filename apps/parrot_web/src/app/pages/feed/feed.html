@@ -40,12 +40,20 @@
 
   <aside class="side-panel panel">
     <ul class="contact-list">
+      @if (!contacts().length) {
+        <li class="empty">No contacts yet.</li>
+      }
       @for (contact of contacts(); track contact.id) {
         <li>
-          <button type="button" class="contact-row" (click)="selectContact(contact.id)">
+          <button
+            type="button"
+            class="contact-row"
+            [class.active]="isActiveContact(contact.id)"
+            (click)="selectContact(contact.id)"
+          >
             <img
               class="avatar"
-              [src]="contact.avatar?.url ?? 'resources/person/men_1.png'"
+              [src]="contact.avatar?.url ?? 'resources/placeholder/avatar.svg'"
               [alt]="contact.firstName"
               width="32"
               height="32"
@@ -55,76 +63,82 @@
         </li>
       }
       <li class="mail-row">
-        <span class="material-symbols-outlined">mail</span>
+        <a routerLink="/chat" aria-label="Open full chat">
+          <span class="material-symbols-outlined">mail</span>
+        </a>
       </li>
     </ul>
 
     <div class="mini-chat">
-      <select
-        class="select"
-        [ngModel]="activeConversationId()"
-        (ngModelChange)="selectConversation($event)"
-      >
-        @for (conversation of chat.conversations(); track conversation.id) {
-          <option [value]="conversation.id">{{ conversation.contactName }}</option>
-        }
-      </select>
+      @if (chat.conversations().length) {
+        <select
+          class="select"
+          [ngModel]="activeConversationId()"
+          (ngModelChange)="selectConversation($event)"
+        >
+          @for (conversation of chat.conversations(); track conversation.id) {
+            <option [value]="conversation.id">{{ conversation.contactName }}</option>
+          }
+        </select>
 
-      <div class="mini-chat-messages">
-        @for (message of activeConversation()?.messages; track message.id) {
-          <div class="bubble" [class.mine]="message.fromMe">
-            @if (message.imageUrl) {
-              <img class="bubble-image" [src]="message.imageUrl" alt="" />
-            }
-            @if (message.text) {
-              <p>{{ message.text }}</p>
-            }
+        <div class="mini-chat-messages">
+          @for (message of activeConversation()?.messages; track message.id) {
+            <div class="bubble" [class.mine]="message.fromMe">
+              @if (message.imageUrl) {
+                <img class="bubble-image" [src]="message.imageUrl" alt="" />
+              }
+              @if (message.text) {
+                <p>{{ message.text }}</p>
+              }
+            </div>
+          }
+        </div>
+
+        @if (attachedImagePreviewUrl(); as preview) {
+          <div class="attachment-preview">
+            <img [src]="preview" alt="" />
+            <button
+              type="button"
+              class="btn btn-icon"
+              (click)="clearAttachedImage()"
+              aria-label="Remove attachment"
+            >
+              <span class="material-symbols-outlined">close</span>
+            </button>
           </div>
         }
-      </div>
 
-      @if (attachedImagePreviewUrl(); as preview) {
-        <div class="attachment-preview">
-          <img [src]="preview" alt="" />
+        <div class="mini-chat-input">
+          <input
+            class="input"
+            type="text"
+            placeholder="write a message ..."
+            [(ngModel)]="messageText"
+            (keyup.enter)="sendMessage()"
+          />
+          <input
+            #miniImageInput
+            type="file"
+            accept="image/*"
+            class="visually-hidden"
+            (change)="onImageSelected($event)"
+          />
+          <button type="button" class="btn btn-icon" (click)="sendMessage()" aria-label="Send">
+            <span class="material-symbols-outlined">send</span>
+          </button>
           <button
             type="button"
             class="btn btn-icon"
-            (click)="clearAttachedImage()"
-            aria-label="Remove attachment"
+            [disabled]="attaching()"
+            (click)="miniImageInput.click()"
+            aria-label="Attach image"
           >
-            <span class="material-symbols-outlined">close</span>
+            <span class="material-symbols-outlined">image</span>
           </button>
         </div>
+      } @else {
+        <p class="empty">No conversations yet.</p>
       }
-
-      <div class="mini-chat-input">
-        <input
-          class="input"
-          type="text"
-          placeholder="write a message ..."
-          [(ngModel)]="messageText"
-          (keyup.enter)="sendMessage()"
-        />
-        <input
-          #miniImageInput
-          type="file"
-          accept="image/*"
-          class="visually-hidden"
-          (change)="onImageSelected($event)"
-        />
-        <button type="button" class="btn btn-icon" (click)="sendMessage()" aria-label="Send">
-          <span class="material-symbols-outlined">send</span>
-        </button>
-        <button
-          type="button"
-          class="btn btn-icon"
-          [disabled]="attaching()"
-          (click)="miniImageInput.click()"
-          aria-label="Attach image"
-        >
-          <span class="material-symbols-outlined">image</span>
-        </button>
-      </div>
     </div>
   </aside>
 </div>

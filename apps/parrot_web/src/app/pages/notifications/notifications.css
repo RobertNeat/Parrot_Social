@@ -35,8 +35,30 @@
   border-radius: var(--radius-sm);
 }
 
+.notification-item.clickable {
+  cursor: pointer;
+}
+
 .notification-text {
   flex: 1;
+}
+
+.notification-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.notification-actions .btn {
+  padding: 4px 12px;
+  font-size: 0.85rem;
+}
+
+.badge {
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--panel-border);
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .time-ago {

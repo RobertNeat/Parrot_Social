@@ -1,7 +1,17 @@
-import { Component, EventEmitter, OnChanges, Output, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  OnChanges,
+  Output,
+  computed,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { UserProfile } from '../../../core/models/user.model';
 import { MediaUploadService } from '../../../core/services/media-upload.service';
+import { FALLBACK_AVATAR, FALLBACK_COVER } from '../../../core/services/user.mapper';
 
 export interface PersonalInfoValue {
   firstName: string;
@@ -34,10 +44,24 @@ export class PersonalInfoForm implements OnChanges {
   @Output() save = new EventEmitter<PersonalInfoValue>();
   @Output() skip = new EventEmitter<void>();
 
-  // Preview defaults to the current profile image (real avatar or the mapper's own fallback
-  // silhouette - UserProfile can't distinguish the two, same as the Profile page's own <img>).
-  readonly avatarPreviewUrl = signal<string | null>(null);
-  readonly coverPreviewUrl = signal<string | null>(null);
+  // Preview is the locally-picked file (object URL) when one was chosen this session,
+  // otherwise falls back to the current profile image from `user()`. Deliberately NOT a plain
+  // signal latched once in ngOnChanges: avatarUrl/coverUrl are single-use, short-lived media
+  // tokens (see MediaAccessService on the API), so the value must track `user()` live - another
+  // consumer (shell navbar, profile page) may have already spent the token this component first
+  // saw, and only a freshly-minted URL from a later `user()` emission will still resolve.
+  private readonly avatarObjectUrlSig = signal<string | null>(null);
+  private readonly coverObjectUrlSig = signal<string | null>(null);
+  // The neutral placeholder URLs aren't a "real" preview image - treat them as absent so the
+  // @else icon block renders instead of an <img> pointing at the placeholder SVG.
+  readonly avatarPreviewUrl = computed(() => {
+    const url = this.avatarObjectUrlSig() ?? this.user()?.avatarUrl ?? null;
+    return url && url !== FALLBACK_AVATAR ? url : null;
+  });
+  readonly coverPreviewUrl = computed(() => {
+    const url = this.coverObjectUrlSig() ?? this.user()?.coverUrl ?? null;
+    return url && url !== FALLBACK_COVER ? url : null;
+  });
   readonly avatarAttachHandle = signal<string | undefined>(undefined);
   readonly coverAttachHandle = signal<string | undefined>(undefined);
   readonly avatarUploading = signal(false);
@@ -70,12 +94,6 @@ export class PersonalInfoForm implements OnChanges {
         provenance: user.provenance ?? '',
         work: user.work ?? '',
       });
-      if (this.avatarPreviewUrl() === null) {
-        this.avatarPreviewUrl.set(user.avatarUrl);
-      }
-      if (this.coverPreviewUrl() === null) {
-        this.coverPreviewUrl.set(user.coverUrl);
-      }
     }
   }
 
@@ -87,7 +105,7 @@ export class PersonalInfoForm implements OnChanges {
     if (!file) return;
 
     const objectUrl = URL.createObjectURL(file);
-    const previewSignal = slot === 'avatar' ? this.avatarPreviewUrl : this.coverPreviewUrl;
+    const objectUrlSignal = slot === 'avatar' ? this.avatarObjectUrlSig : this.coverObjectUrlSig;
     const uploadingSignal = slot === 'avatar' ? this.avatarUploading : this.coverUploading;
     const handleSignal = slot === 'avatar' ? this.avatarAttachHandle : this.coverAttachHandle;
 
@@ -97,7 +115,7 @@ export class PersonalInfoForm implements OnChanges {
     } else {
       this.coverObjectUrl = objectUrl;
     }
-    previewSignal.set(objectUrl);
+    objectUrlSignal.set(objectUrl);
     uploadingSignal.set(true);
 
     try {
@@ -107,9 +125,7 @@ export class PersonalInfoForm implements OnChanges {
       // Upload failed - fall back to whatever was shown before (current profile image, or icon).
       this.revokeObjectUrl(slot);
       handleSignal.set(undefined);
-      previewSignal.set(
-        slot === 'avatar' ? (this.user()?.avatarUrl ?? null) : (this.user()?.coverUrl ?? null),
-      );
+      objectUrlSignal.set(null);
     } finally {
       uploadingSignal.set(false);
     }

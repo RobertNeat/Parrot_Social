@@ -1,7 +1,6 @@
 import type { CommentDto, PostDto } from '@parrot-social/shared-dto';
 import { Comment, Post } from '../models/post.model';
-
-const FALLBACK_AVATAR = 'resources/person/men_1.png';
+import { FALLBACK_AVATAR } from './user.mapper';
 
 /** Maps the real API shape to the local Post/Comment models used by PostCard, shared by
  * feed/profile/group pages so each page doesn't duplicate this mapping. */

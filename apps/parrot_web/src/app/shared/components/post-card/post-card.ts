@@ -1,10 +1,11 @@
 import { Component, EventEmitter, Output, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { Post } from '../../../core/models/post.model';
 
 @Component({
   selector: 'app-post-card',
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   templateUrl: './post-card.html',
   styleUrl: './post-card.css',
 })

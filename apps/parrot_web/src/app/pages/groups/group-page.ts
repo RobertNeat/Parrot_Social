@@ -2,7 +2,6 @@ import {
   Component,
   DestroyRef,
   ElementRef,
-  afterNextRender,
   computed,
   effect,
   inject,
@@ -34,15 +33,22 @@ export class GroupPage {
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly postsGrid = viewChild.required<ElementRef<HTMLElement>>('postsGrid');
+  // Optional (not .required): the element lives inside an `@if (group(); as group)` block,
+  // so it doesn't exist in the DOM until the async group load resolves.
+  readonly postsGrid = viewChild<ElementRef<HTMLElement>>('postsGrid');
   private readonly columnCount = signal(1);
 
   readonly group = signal<Group | undefined>(undefined);
   private loadingId: string | null = null;
 
   constructor() {
-    afterNextRender(() => {
-      watchColumnCount(this.postsGrid(), this.columnCount, this.destroyRef, 260, 20);
+    // effect (not afterNextRender) - the grid can mount, unmount (group not found) and remount
+    // (later navigation) across this component's lifetime, so watch for the element becoming
+    // available rather than assuming a single render.
+    effect((onCleanup) => {
+      const grid = this.postsGrid();
+      if (!grid) return;
+      onCleanup(watchColumnCount(grid, this.columnCount, this.destroyRef, 260, 20));
     });
 
     // Angular reuses this component instance across /groups/x -> /groups/y navigations, so

@@ -35,21 +35,69 @@
               <span class="avatar-edit-icon material-symbols-outlined">photo_camera</span>
             }
           </button>
-          @if (isOwnProfile()) {
-            <input
-              #avatarInput
-              type="file"
-              accept="image/*"
-              class="visually-hidden"
-              (change)="onAvatarSelected($event)"
-            />
-          }
+          <input
+            #avatarInput
+            type="file"
+            accept="image/*"
+            class="visually-hidden"
+            (change)="onAvatarSelected($event)"
+          />
           <div class="cover-text">
             <h1>{{ profile.firstName }} {{ profile.lastName }}</h1>
             <p>{{ profile.bio }}</p>
           </div>
         </div>
       </div>
+
+      @if (!isOwnProfile() && friendshipStatus()) {
+        <div class="friendship-actions panel">
+          @switch (friendshipStatus()) {
+            @case ('none') {
+              <button
+                type="button"
+                class="btn btn-primary"
+                [disabled]="friendshipActionPending()"
+                (click)="sendFriendRequest()"
+              >
+                <span class="material-symbols-outlined">person_add</span>
+                Add friend
+              </button>
+            }
+            @case ('pending_sent') {
+              <span class="badge">Request sent</span>
+            }
+            @case ('pending_received') {
+              <button
+                type="button"
+                class="btn btn-primary"
+                [disabled]="friendshipActionPending()"
+                (click)="acceptFriendRequest()"
+              >
+                Accept
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-gradient"
+                [disabled]="friendshipActionPending()"
+                (click)="declineFriendRequest()"
+              >
+                Decline
+              </button>
+            }
+            @case ('friends') {
+              <span class="badge">Friends</span>
+              <button
+                type="button"
+                class="btn btn-outline-gradient"
+                [disabled]="friendshipActionPending()"
+                (click)="unfriend()"
+              >
+                Unfriend
+              </button>
+            }
+          }
+        </div>
+      }
 
       @if (isOwnProfile()) {
         <div class="composer panel">

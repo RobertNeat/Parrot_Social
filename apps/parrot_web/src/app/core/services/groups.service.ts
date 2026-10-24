@@ -14,8 +14,12 @@ function toLocalGroup(dto: GroupDto): Group {
     name: dto.name,
     description: dto.description,
     memberCount: dto.memberCount,
+    ownerId: dto.ownerId,
     ownerName: dto.ownerName,
-    members: dto.members.map((member) => `${member.firstName} ${member.lastName}`),
+    members: dto.members.map((member) => ({
+      id: member.id,
+      name: `${member.firstName} ${member.lastName}`,
+    })),
     joined: dto.joined,
   };
 }

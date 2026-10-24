@@ -13,6 +13,7 @@ import { EventsModule } from './events/events.module.js';
 import { ChatModule } from './chat/chat.module.js';
 import { NotificationsModule } from './notifications/notifications.module.js';
 import { SearchModule } from './search/search.module.js';
+import { FriendshipModule } from './friendship/friendship.module.js';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { SearchModule } from './search/search.module.js';
     ChatModule,
     NotificationsModule,
     SearchModule,
+    FriendshipModule,
   ],
   controllers: [AppController],
   providers: [

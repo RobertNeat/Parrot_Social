@@ -15,6 +15,12 @@
   max-width: 380px;
 }
 
+.brand-heading {
+  margin: 0;
+  font-size: 1.6rem;
+  text-align: center;
+}
+
 .register-btn {
   width: 100%;
   padding: 14px;

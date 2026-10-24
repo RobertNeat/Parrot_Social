@@ -1,5 +1,8 @@
 <div class="chat-layout panel">
   <aside class="conversation-list">
+    @if (!chat.conversations().length) {
+      <p class="empty">No conversations yet.</p>
+    }
     @for (conversation of chat.conversations(); track conversation.id) {
       <button
         type="button"
@@ -20,6 +23,11 @@
   </aside>
 
   <section class="conversation-view">
+    @if (!chat.conversations().length) {
+      <p class="empty">
+        No conversations yet. Start chatting with a friend from their profile.
+      </p>
+    }
     @if (activeConversation(); as conversation) {
       <header class="conversation-header">{{ conversation.contactName }}</header>
       <div class="messages">

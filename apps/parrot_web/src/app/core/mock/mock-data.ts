@@ -177,6 +177,10 @@ export const EVENTS: EventItem[] = [
     description:
       "Join us for an elegant evening of giving, where we'll come together to raise funds for local charities. Enjoy a night of fine dining, live entertainment, and philanthropy.",
     imageUrl: eventImg('event_1.png'),
+    startsAt: '2026-11-14T19:00:00.000Z',
+    location: 'Grand Ballroom, Downtown Hotel',
+    organizerId: 'u1',
+    organizerName: 'John Davis',
     interestedCount: 3,
     interested: true,
   },
@@ -186,6 +190,10 @@ export const EVENTS: EventItem[] = [
     description:
       'Calling all tech enthusiasts! Connect with industry leaders, share ideas, and stay ahead of the curve at our Tech Innovators Meetup. Network with ...',
     imageUrl: eventImg('event_2.png'),
+    startsAt: '2026-11-20T18:00:00.000Z',
+    location: 'Innovation Hub, 5th Avenue',
+    organizerId: 'u2',
+    organizerName: 'Allan Bullock',
     interestedCount: 3,
     interested: false,
   },
@@ -195,6 +203,10 @@ export const EVENTS: EventItem[] = [
     description:
       'Celebrate diversity and cultural richness at our Cultural Fusion Festival. Experience a melting pot of traditions, music, dance, and cuisine from around ...',
     imageUrl: eventImg('event_3.png'),
+    startsAt: '2026-12-02T12:00:00.000Z',
+    location: 'Riverside Park',
+    organizerId: 'u1',
+    organizerName: 'John Davis',
     interestedCount: 3,
     interested: true,
   },
@@ -204,6 +216,10 @@ export const EVENTS: EventItem[] = [
     description:
       'A three-day celebration of live music across five stages, food trucks and art installations. Grab your friends and your dancing shoes.',
     imageUrl: eventImg('event_4.png'),
+    startsAt: '2026-07-10T16:00:00.000Z',
+    location: null,
+    organizerId: 'u3',
+    organizerName: 'Maria Lopez',
     interestedCount: 5,
     interested: false,
   },
@@ -213,6 +229,10 @@ export const EVENTS: EventItem[] = [
     description:
       'An intimate club night featuring up-and-coming DJs spinning house and techno until sunrise.',
     imageUrl: eventImg('event_2.png'),
+    startsAt: '2026-11-28T22:00:00.000Z',
+    location: 'The Basement Club',
+    organizerId: 'u2',
+    organizerName: 'Allan Bullock',
     interestedCount: 2,
     interested: false,
   },
@@ -222,6 +242,10 @@ export const EVENTS: EventItem[] = [
     description:
       'Ring in the new year with the whole city — live music, food stalls and a spectacular fireworks show at midnight.',
     imageUrl: eventImg('event_3.png'),
+    startsAt: '2026-12-31T23:00:00.000Z',
+    location: 'City Square',
+    organizerId: 'u3',
+    organizerName: 'Maria Lopez',
     interestedCount: 8,
     interested: true,
   },
@@ -234,8 +258,14 @@ export const GROUPS: Group[] = [
     description:
       'Long group description giving the group existence and pointing to what they are exsisting.',
     memberCount: 4,
+    ownerId: 'u-jamal',
     ownerName: 'Jamal Pearson',
-    members: ['Jamal Pearson', 'Tom Scott', 'Miley Marcus', 'Patty Weddy'],
+    members: [
+      { id: 'u-jamal', name: 'Jamal Pearson' },
+      { id: 'u-tom', name: 'Tom Scott' },
+      { id: 'u-miley', name: 'Miley Marcus' },
+      { id: 'u-patty', name: 'Patty Weddy' },
+    ],
     joined: true,
   },
   {
@@ -244,8 +274,13 @@ export const GROUPS: Group[] = [
     description:
       'For anyone who loves getting outdoors on the weekend — trail reports, meetups and gear talk.',
     memberCount: 3,
+    ownerId: 'u-solomon',
     ownerName: 'Solomon Rhodes',
-    members: ['Solomon Rhodes', 'John Strong', 'Nevaeh Arias'],
+    members: [
+      { id: 'u-solomon', name: 'Solomon Rhodes' },
+      { id: 'u-johns', name: 'John Strong' },
+      { id: 'u-nevaeh', name: 'Nevaeh Arias' },
+    ],
     joined: false,
   },
 ];
@@ -349,6 +384,7 @@ export const CONVERSATIONS: Conversation[] = [
 export const NOTIFICATIONS: AppNotification[] = [
   {
     id: 'n1',
+    type: 'post-like',
     icon: 'favorite',
     text: 'Jamal Pearson liked your post.',
     timeAgo: '5m',
@@ -356,6 +392,7 @@ export const NOTIFICATIONS: AppNotification[] = [
   },
   {
     id: 'n2',
+    type: 'post-comment',
     icon: 'chat_bubble',
     text: 'Solomon Rhodes commented on your post.',
     timeAgo: '1h',
@@ -363,6 +400,7 @@ export const NOTIFICATIONS: AppNotification[] = [
   },
   {
     id: 'n3',
+    type: 'event-reminder',
     icon: 'event',
     text: 'Charity Gala Night is starting soon.',
     timeAgo: '3h',
@@ -370,6 +408,7 @@ export const NOTIFICATIONS: AppNotification[] = [
   },
   {
     id: 'n4',
+    type: 'group-invite',
     icon: 'group',
     text: 'You were added to Photography Lovers.',
     timeAgo: '1d',
@@ -377,6 +416,7 @@ export const NOTIFICATIONS: AppNotification[] = [
   },
   {
     id: 'n5',
+    type: 'friend-request',
     icon: 'person_add',
     text: 'Nevaeh Arias sent you a friend request.',
     timeAgo: '2d',

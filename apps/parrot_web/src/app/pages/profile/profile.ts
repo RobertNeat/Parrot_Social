@@ -2,7 +2,6 @@ import {
   Component,
   DestroyRef,
   ElementRef,
-  afterNextRender,
   computed,
   effect,
   inject,
@@ -13,10 +12,12 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { FeedService } from '../../core/services/feed.service';
+import { FriendshipService } from '../../core/services/friendship.service';
 import { MediaUploadService } from '../../core/services/media-upload.service';
 import { ProfileService } from '../../core/services/profile.service';
 import { Post } from '../../core/models/post.model';
 import { UserProfile } from '../../core/models/user.model';
+import type { FriendshipStatus } from '@parrot-social/shared-dto';
 import { PostCard } from '../../shared/components/post-card/post-card';
 import {
   distributeRoundRobin,
@@ -36,16 +37,22 @@ export class Profile {
   readonly feed = inject(FeedService);
   private readonly mediaUpload = inject(MediaUploadService);
   private readonly profileService = inject(ProfileService);
+  private readonly friendshipService = inject(FriendshipService);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly postsGrid = viewChild.required<ElementRef<HTMLElement>>('postsGrid');
+  // Optional (not .required): the element lives inside an `@if (profile(); as profile)` block,
+  // so it doesn't exist in the DOM until the async profile load resolves.
+  readonly postsGrid = viewChild<ElementRef<HTMLElement>>('postsGrid');
   private readonly columnCount = signal(1);
 
   readonly profile = signal<UserProfile | null>(null);
   readonly posts = signal<Post[]>([]);
   readonly avatarUploading = signal(false);
   readonly coverUploading = signal(false);
+  readonly friendshipStatus = signal<FriendshipStatus | null>(null);
+  readonly friendshipRequestId = signal<string | undefined>(undefined);
+  readonly friendshipActionPending = signal(false);
 
   private readonly routeId = toSignal(this.route.paramMap.pipe(map((params) => params.get('id'))), {
     initialValue: null,
@@ -59,8 +66,13 @@ export class Profile {
   private loadingId: string | null = null;
 
   constructor() {
-    afterNextRender(() => {
-      watchColumnCount(this.postsGrid(), this.columnCount, this.destroyRef, 280, 20);
+    // effect (not afterNextRender) - the grid can mount, unmount (profile not found) and
+    // remount (later navigation) across this component's lifetime, so watch for the element
+    // becoming available rather than assuming a single render.
+    effect((onCleanup) => {
+      const grid = this.postsGrid();
+      if (!grid) return;
+      onCleanup(watchColumnCount(grid, this.columnCount, this.destroyRef, 280, 20));
     });
 
     // Angular reuses this component instance across /profile/a -> /profile/b navigations, so
@@ -76,13 +88,14 @@ export class Profile {
       return;
     }
     this.loadingId = targetId;
-    const ownId = this.auth.currentUser()?.id;
-    const profile =
-      targetId === ownId
-        ? this.auth.currentUser()
-        : await this.profileService.loadProfile(targetId);
+    // Always re-fetch rather than reusing auth.currentUser(): its avatarUrl/coverUrl are
+    // single-use, short-lived media tokens that may already be spent (e.g. the shell navbar
+    // rendered the same avatar) or expired by the time this page mounts.
+    const profile = await this.profileService.loadProfile(targetId);
     if (this.loadingId !== targetId) return; // stale response - a newer navigation already started
     this.profile.set(profile);
+    this.friendshipStatus.set(null);
+    this.friendshipRequestId.set(undefined);
     if (!profile) {
       this.posts.set([]);
       return;
@@ -90,6 +103,72 @@ export class Profile {
     const posts = await this.profileService.loadPostsByAuthor(profile.id);
     if (this.loadingId !== targetId) return;
     this.posts.set(posts);
+
+    if (profile.id !== this.auth.currentUser()?.id) {
+      const status = await this.friendshipService.getStatus(profile.id);
+      if (this.loadingId !== targetId) return;
+      this.friendshipStatus.set(status.status);
+      this.friendshipRequestId.set(status.requestId);
+    }
+  }
+
+  async sendFriendRequest(): Promise<void> {
+    const profile = this.profile();
+    if (!profile || this.friendshipActionPending()) return;
+    this.friendshipActionPending.set(true);
+    try {
+      const result = await this.friendshipService.sendRequest(profile.id);
+      if (result) {
+        this.friendshipStatus.set('pending_sent');
+        this.friendshipRequestId.set(result.id);
+      }
+    } finally {
+      this.friendshipActionPending.set(false);
+    }
+  }
+
+  async acceptFriendRequest(): Promise<void> {
+    const requestId = this.friendshipRequestId();
+    if (!requestId || this.friendshipActionPending()) return;
+    this.friendshipActionPending.set(true);
+    try {
+      const result = await this.friendshipService.accept(requestId);
+      if (result) {
+        this.friendshipStatus.set('friends');
+      }
+    } finally {
+      this.friendshipActionPending.set(false);
+    }
+  }
+
+  async declineFriendRequest(): Promise<void> {
+    const requestId = this.friendshipRequestId();
+    if (!requestId || this.friendshipActionPending()) return;
+    this.friendshipActionPending.set(true);
+    try {
+      const ok = await this.friendshipService.decline(requestId);
+      if (ok) {
+        this.friendshipStatus.set('none');
+        this.friendshipRequestId.set(undefined);
+      }
+    } finally {
+      this.friendshipActionPending.set(false);
+    }
+  }
+
+  async unfriend(): Promise<void> {
+    const profile = this.profile();
+    if (!profile || this.friendshipActionPending()) return;
+    this.friendshipActionPending.set(true);
+    try {
+      const ok = await this.friendshipService.unfriend(profile.id);
+      if (ok) {
+        this.friendshipStatus.set('none');
+        this.friendshipRequestId.set(undefined);
+      }
+    } finally {
+      this.friendshipActionPending.set(false);
+    }
   }
 
   like(postId: string): void {

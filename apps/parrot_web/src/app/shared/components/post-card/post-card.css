@@ -16,6 +16,20 @@
   position: relative;
 }
 
+.post-author-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.post-author-link:hover .author-name {
+  text-decoration: underline;
+}
+
 .author-name {
   font-weight: 700;
   flex: 1;

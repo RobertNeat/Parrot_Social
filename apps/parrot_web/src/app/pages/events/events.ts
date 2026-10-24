@@ -1,11 +1,12 @@
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { EventsService } from '../../core/services/events.service';
 import { MediaUploadService } from '../../core/services/media-upload.service';
 
 @Component({
   selector: 'app-events',
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   templateUrl: './events.html',
   styleUrl: './events.css',
 })
@@ -14,6 +15,7 @@ export class Events {
   readonly title = signal('');
   readonly description = signal('');
   readonly startsAt = signal('');
+  readonly location = signal('');
   readonly submitting = signal(false);
   readonly error = signal('');
   private selectedImage: File | undefined;
@@ -25,7 +27,10 @@ export class Events {
     void this.eventsService.load();
   }
 
-  async toggle(eventId: string): Promise<void> {
+  async toggle(eventId: string, event: Event): Promise<void> {
+    // Card itself is a routerLink now - stop the click reaching it and following the href.
+    event.preventDefault();
+    event.stopPropagation();
     await this.eventsService.toggleInterested(eventId);
   }
 
@@ -60,10 +65,12 @@ export class Events {
         : undefined;
       // datetime-local has no timezone - interpret it as local time, then send ISO (UTC).
       const startsAtIso = new Date(startsAt).toISOString();
+      const location = this.location().trim();
       const ok = await this.eventsService.createEvent({
         title,
         description,
         startsAt: startsAtIso,
+        location: location || undefined,
         imageAttachHandle,
       });
       if (ok) {
@@ -81,6 +88,7 @@ export class Events {
     this.title.set('');
     this.description.set('');
     this.startsAt.set('');
+    this.location.set('');
     this.selectedImage = undefined;
     this.error.set('');
   }

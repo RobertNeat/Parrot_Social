@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Obrazki wydarzeń - odwzorowanie oryginalnych mock-data.ts (eventImg('event_N.png')),
+         przywrócone po tym jak 004-seed-events.xml zostawił image_media_id NULL (plik wtedy
+         nie istniał w wolumenie). Pliki skopiowane z apps/parrot_web/public/resources/event/
+         do deploy/liquibase/seed/media/ (zob. 009-seed-media.xml dla wzorca bind-mountu) -
+         trzymane tu osobno, żeby można było łatwo podmienić bez grzebania w głównym pliku
+         media. Tylko 4 unikalne obrazki na 6 eventów (na życzenie: żaden plik nie może się
+         powtórzyć) - Underground Beats Night i New Year Fireworks zostają bez zdjęcia,
+         fallback na neutralny placeholder we frontendzie (events.service.ts). -->
+    <changeSet id="seed-010-event-images" author="robert.sereda" context="seed">
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000042"/>
+            <column name="stored_file_name" value="event_1.png"/>
+            <column name="original_file_name" value="event_1.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="208845"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000001"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000043"/>
+            <column name="stored_file_name" value="event_2.png"/>
+            <column name="original_file_name" value="event_2.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="125659"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000002"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000044"/>
+            <column name="stored_file_name" value="event_3.png"/>
+            <column name="original_file_name" value="event_3.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="150918"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000003"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000045"/>
+            <column name="stored_file_name" value="event_4.png"/>
+            <column name="original_file_name" value="event_4.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="227261"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000004"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-010-event-image-assignments" author="robert.sereda" context="seed">
+        <!-- Charity Gala Night -->
+        <update tableName="event">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000042"/>
+            <where>id = '00000000-0000-0000-0004-000000000001'</where>
+        </update>
+        <!-- Tech Innovators Meetup -->
+        <update tableName="event">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000043"/>
+            <where>id = '00000000-0000-0000-0004-000000000002'</where>
+        </update>
+        <!-- Cultural Fusion Festival -->
+        <update tableName="event">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000044"/>
+            <where>id = '00000000-0000-0000-0004-000000000003'</where>
+        </update>
+        <!-- Summer Music Festival -->
+        <update tableName="event">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000045"/>
+            <where>id = '00000000-0000-0000-0004-000000000004'</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

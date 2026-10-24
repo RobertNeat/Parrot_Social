@@ -1,7 +1,10 @@
 import type { CurrentUserDto, UserProfileDto } from '@parrot-social/shared-dto';
 import { UserProfile } from '../models/user.model';
 
-const FALLBACK_AVATAR = 'resources/person/men_1.png';
+// Neutral placeholders shown when a user has no avatar/cover set (e.g. a brand-new account) -
+// deliberately NOT one of the seed photo-pool images, which would look like someone else's photo.
+export const FALLBACK_AVATAR = 'resources/placeholder/avatar.svg';
+export const FALLBACK_COVER = 'resources/placeholder/cover.svg';
 
 /** Maps the real profile DTO shape (UserProfileDto or the CurrentUserDto that extends it with
  * email) to the local UserProfile model used by Profile/Settings/shell pages. `email` is only
@@ -14,7 +17,7 @@ export function toLocalProfile(dto: UserProfileDto | CurrentUserDto): UserProfil
     firstName: dto.firstName,
     lastName: dto.lastName,
     avatarUrl: dto.avatar?.url ?? FALLBACK_AVATAR,
-    coverUrl: dto.cover?.url ?? FALLBACK_AVATAR,
+    coverUrl: dto.cover?.url ?? FALLBACK_COVER,
     bio: dto.bio ?? '',
     work: dto.work,
     education: dto.education,

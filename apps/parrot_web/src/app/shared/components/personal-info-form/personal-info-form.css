@@ -23,8 +23,23 @@
   gap: 16px;
 }
 
+.image-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cover-field {
+  grid-column: 1 / -1;
+}
+
+.image-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-on-panel-muted);
+}
+
 .image-placeholder {
-  flex: 1;
   background: var(--panel-strong);
   border-radius: var(--radius-sm);
   display: flex;
@@ -32,12 +47,21 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 120px;
   font-weight: 700;
   color: var(--text-on-panel);
   cursor: pointer;
   position: relative;
   overflow: hidden;
+}
+
+.avatar-placeholder {
+  aspect-ratio: 1 / 1;
+}
+
+/* Matches the profile page's .cover height-to-width ratio (220px tall against the typical
+   profile-main column width) so cropping previewed here lines up with the actual profile. */
+.cover-placeholder {
+  aspect-ratio: 16 / 5;
 }
 
 .image-placeholder .material-symbols-outlined {

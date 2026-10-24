@@ -5,7 +5,7 @@ import type { PagedResponseDto, PostDto, UserProfileDto } from '@parrot-social/s
 import { environment } from '../../../environments/environment';
 import { UserProfile } from '../models/user.model';
 import { Post } from '../models/post.model';
-import { toLocalProfile } from './user.mapper';
+import { FALLBACK_AVATAR, FALLBACK_COVER, toLocalProfile } from './user.mapper';
 import { toLocalPost } from './post.mapper';
 
 @Injectable({ providedIn: 'root' })
@@ -43,8 +43,8 @@ export class ProfileService {
       email: '',
       firstName: summary.firstName,
       lastName: summary.lastName,
-      avatarUrl: summary.avatar?.url ?? 'resources/person/men_1.png',
-      coverUrl: 'resources/person/men_1.png',
+      avatarUrl: summary.avatar?.url ?? FALLBACK_AVATAR,
+      coverUrl: FALLBACK_COVER,
       bio: '',
       memberSince: '',
     }));

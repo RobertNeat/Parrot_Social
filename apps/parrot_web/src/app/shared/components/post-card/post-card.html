@@ -1,13 +1,15 @@
 <article class="post panel">
   <header class="post-header">
-    <img
-      class="avatar"
-      [src]="post().authorAvatarUrl"
-      [alt]="post().authorName"
-      width="40"
-      height="40"
-    />
-    <span class="author-name">{{ post().authorName }}</span>
+    <a class="post-author-link" [routerLink]="['/profile', post().authorId]">
+      <img
+        class="avatar"
+        [src]="post().authorAvatarUrl"
+        [alt]="post().authorName"
+        width="40"
+        height="40"
+      />
+      <span class="author-name">{{ post().authorName }}</span>
+    </a>
     @if (ownPost()) {
       <div class="menu-wrap">
         <button type="button" class="btn btn-icon" (click)="toggleMenu()" aria-label="Post options">
@@ -32,7 +34,8 @@
       class="btn btn-icon"
       [class.active]="post().liked"
       (click)="like.emit(post().id)"
-      aria-label="Like"
+      title="Like - show appreciation for this post"
+      aria-label="Like this post"
     >
       <span class="material-symbols-outlined">favorite</span>
     </button>
@@ -41,7 +44,8 @@
       class="btn btn-icon"
       [class.active]="post().upvoted"
       (click)="upvote.emit(post().id)"
-      aria-label="Upvote"
+      title="Upvote - help this post rank higher"
+      aria-label="Upvote this post"
     >
       <span class="material-symbols-outlined">thumb_up</span>
     </button>

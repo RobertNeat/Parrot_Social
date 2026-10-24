@@ -1,0 +1,710 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Rozszerzenie 003-seed-posts.xml: dopełnia feed tak, żeby wykorzystać WSZYSTKIE
+         pozostałe post_image_* pliki w deploy/liquibase/seed/media/ (na życzenie
+         użytkownika - żaden plik z puli mock-data nie powinien zostać nieużyty).
+         3-4 nowe posty na istniejącego usera, bez nowych kont. Teksty dobrane
+         konkretnie do tego, co widać na przypisanym zdjęciu, kontynuując
+         zainteresowania usera ustalone w 003-seed-posts.xml (np. Jamal = szlaki/outdoor,
+         Solomon = muzyka/tłumy, Zakaria = dzika przyroda, Seamus = kemping/wschody
+         słońca). -->
+
+    <changeSet id="seed-011-more-posts" author="robert.sereda" context="seed">
+        <!-- Solomon Rhodes (u3) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000022"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000003"/>
+            <column name="text" value="Laptop open, iced tea sweating onto the notebook, three people's conversations blending into one soundtrack. Best office I don't pay rent for."/>
+            <column name="created_at" valueComputed="now() - interval '11 days'"/>
+        </insert>
+        <!-- Nevaeh Arias (u5) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000023"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000005"/>
+            <column name="text" value="Two ducks had the whole lake to themselves this morning. The trees were doing their best impression of fire."/>
+            <column name="created_at" valueComputed="now() - interval '10 days'"/>
+        </insert>
+        <!-- Seamus Ross (u10) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000024"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000010"/>
+            <column name="text" value="Two balloons, one sunset, zero regrets about the 4am alarm. Cappadocia doesn't miss."/>
+            <column name="created_at" valueComputed="now() - interval '9 days'"/>
+        </insert>
+        <!-- John Strong (u4) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000025"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000004"/>
+            <column name="text" value="Track practice turned into a victory lap just because the evening light was too good to waste."/>
+            <column name="created_at" valueComputed="now() - interval '8 days'"/>
+        </insert>
+        <!-- Tomas Gutierrez (u7) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000026"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000007"/>
+            <column name="text" value="Found this half-forgotten aviary tucked into a park in Hanoi - rusted cages, red brick, and a bench someone still sits on."/>
+            <column name="created_at" valueComputed="now() - interval '7 days 12 hours'"/>
+        </insert>
+        <!-- Allan Bullock (u8) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000027"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000008"/>
+            <column name="text" value="Mom and baby elephant sharing a snack a few meters from the trail. Everyone in the group went dead silent."/>
+            <column name="created_at" valueComputed="now() - interval '7 days'"/>
+        </insert>
+        <!-- Zakaria Mccoy (u9) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000028"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000009"/>
+            <column name="text" value="This elephant house has more architectural ambition than most city halls I've seen. The carved head over the door is a nice touch."/>
+            <column name="created_at" valueComputed="now() - interval '6 days 18 hours'"/>
+        </insert>
+        <!-- John Davis (u1) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000029"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="text" value="Caught her mid-shoot in someone's overgrown backyard garden. The agave plants almost stole the frame."/>
+            <column name="created_at" valueComputed="now() - interval '6 days'"/>
+        </insert>
+        <!-- Allan Bullock (u8) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000030"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000008"/>
+            <column name="text" value="A tusker and his calf walked straight toward our jeep and didn't even slow down. Savanna rush hour."/>
+            <column name="created_at" valueComputed="now() - interval '5 days 12 hours'"/>
+        </insert>
+        <!-- Tomas Gutierrez (u7) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000031"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000007"/>
+            <column name="text" value="Golden hour on an old facade with carved figures holding up the balcony. Palm trees doing their best to compete with the stonework."/>
+            <column name="created_at" valueComputed="now() - interval '5 days'"/>
+        </insert>
+        <!-- Jamal Pearson (u2) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000032"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000002"/>
+            <column name="text" value="Backpack on, red rock canyon ahead, no plan beyond walking until the light runs out."/>
+            <column name="created_at" valueComputed="now() - interval '4 days 18 hours'"/>
+        </insert>
+        <!-- Solomon Rhodes (u3) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000033"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000003"/>
+            <column name="text" value="Heroes' Square absolutely packed tonight - thousands of us under that column, more showing up every minute."/>
+            <column name="created_at" valueComputed="now() - interval '4 days 6 hours'"/>
+        </insert>
+        <!-- Solomon Rhodes (u3) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000034"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000003"/>
+            <column name="text" value="Smoke machine working overtime, band barely visible, crowd singing louder than the speakers. This is why I keep coming back."/>
+            <column name="created_at" valueComputed="now() - interval '4 days'"/>
+        </insert>
+        <!-- Seamus Ross (u10) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000035"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000010"/>
+            <column name="text" value="Pitched higher than planned and got rewarded with a view over the whole valley. Orange tents, green hills, zero signal."/>
+            <column name="created_at" valueComputed="now() - interval '3 days 18 hours'"/>
+        </insert>
+        <!-- Jamal Pearson (u2) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000036"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000002"/>
+            <column name="text" value="Stopped the bikes just to stare at the valley for a while. Worth every meter of climbing to get up here."/>
+            <column name="created_at" valueComputed="now() - interval '3 days 12 hours'"/>
+        </insert>
+        <!-- John Strong (u4) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000037"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000004"/>
+            <column name="text" value="He doesn't care about my pace, only that we're moving. Best running partner I've had."/>
+            <column name="created_at" valueComputed="now() - interval '3 days 6 hours'"/>
+        </insert>
+        <!-- Zakaria Mccoy (u9) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000038"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000009"/>
+            <column name="text" value="Caught this one launching off the treetop mid-shutter - wings fully spread, completely unbothered by the fog."/>
+            <column name="created_at" valueComputed="now() - interval '2 days 18 hours'"/>
+        </insert>
+        <!-- Seamus Ross (u10) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000039"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000010"/>
+            <column name="text" value="Fall colors, a scatter of tents, and a group of us arguing about whose turn it was to get firewood."/>
+            <column name="created_at" valueComputed="now() - interval '2 days 12 hours'"/>
+        </insert>
+        <!-- Jamal Pearson (u2) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000040"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000002"/>
+            <column name="text" value="That granite wall behind us put our little bikes in perspective real fast. Yosemite does that to you."/>
+            <column name="created_at" valueComputed="now() - interval '2 days 6 hours'"/>
+        </insert>
+        <!-- Marvin Barlow (u6) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000041"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000006"/>
+            <column name="text" value="He reached back to help me up the last mossy ledge - teamwork makes the scramble work."/>
+            <column name="created_at" valueComputed="now() - interval '1 day 20 hours'"/>
+        </insert>
+        <!-- Zakaria Mccoy (u9) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000042"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000009"/>
+            <column name="text" value="This owl stared me down for a full minute before deciding I wasn't worth the energy. Fair enough."/>
+            <column name="created_at" valueComputed="now() - interval '1 day 14 hours'"/>
+        </insert>
+        <!-- Jamal Pearson (u2) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000043"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000002"/>
+            <column name="text" value="Three of us strung out along the gravel road under the pines - longest, quietest ride we've done all year."/>
+            <column name="created_at" valueComputed="now() - interval '1 day 8 hours'"/>
+        </insert>
+        <!-- Allan Bullock (u8) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000044"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000008"/>
+            <column name="text" value="She paused mid-stride, ears up, and looked straight through the lens. Red foxes at golden hour are unfair."/>
+            <column name="created_at" valueComputed="now() - interval '22 hours'"/>
+        </insert>
+        <!-- Marvin Barlow (u6) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000045"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000006"/>
+            <column name="text" value="Stretching the knee before the last push - that glacier lake behind me made the whole climb worth it."/>
+            <column name="created_at" valueComputed="now() - interval '20 hours'"/>
+        </insert>
+        <!-- Seamus Ross (u10) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000046"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000010"/>
+            <column name="text" value="Riverside camp, campfire smoke drifting into the valley fog. This tent has seen more sunrises than my bed has."/>
+            <column name="created_at" valueComputed="now() - interval '18 hours'"/>
+        </insert>
+        <!-- Marvin Barlow (u6) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000047"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000006"/>
+            <column name="text" value="Fog so thick the treeline disappeared twenty meters out. Just us, the trail, and someone's bright red jacket to follow."/>
+            <column name="created_at" valueComputed="now() - interval '16 hours'"/>
+        </insert>
+        <!-- John Strong (u4) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000048"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000004"/>
+            <column name="text" value="Evening loop around the lake, lanterns just starting to come on. Quietest hour of the whole day."/>
+            <column name="created_at" valueComputed="now() - interval '14 hours'"/>
+        </insert>
+        <!-- Tomas Gutierrez (u7) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000049"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000007"/>
+            <column name="text" value="This old spa building has a golden deer statue guarding the entrance and a dome that catches the whole sunset."/>
+            <column name="created_at" valueComputed="now() - interval '12 hours'"/>
+        </insert>
+        <!-- Seamus Ross (u10) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000050"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000010"/>
+            <column name="text" value="Lime green and deep red against a fog-blue lake at dusk - sometimes the tent colors make the photo."/>
+            <column name="created_at" valueComputed="now() - interval '10 hours'"/>
+        </insert>
+        <!-- Tomas Gutierrez (u7) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000051"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000007"/>
+            <column name="text" value="Blue glasswork, onion dome, a double colonnade - this old gallery building looks like it belongs on a postcard, not down the street from my hotel."/>
+            <column name="created_at" valueComputed="now() - interval '9 hours'"/>
+        </insert>
+        <!-- Nevaeh Arias (u5) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000052"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000005"/>
+            <column name="text" value="Fingerless gloves, a worn paperback, sun flaring through the leaves - this is what I call a good Tuesday."/>
+            <column name="created_at" valueComputed="now() - interval '8 hours'"/>
+        </insert>
+        <!-- Marvin Barlow (u6) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000053"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000006"/>
+            <column name="text" value="Roots everywhere, barely any trail left to speak of - this is the part of the hike nobody shows you in the brochure."/>
+            <column name="created_at" valueComputed="now() - interval '7 hours'"/>
+        </insert>
+        <!-- Jamal Pearson (u2) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000054"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000002"/>
+            <column name="text" value="Found a decent boulder to pose on and immediately regretted the all-white outfit choice for a hike this dusty."/>
+            <column name="created_at" valueComputed="now() - interval '6 hours'"/>
+        </insert>
+        <!-- Seamus Ross (u10) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000055"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000010"/>
+            <column name="text" value="Somebody hand-painted the campsite sign and now I feel obligated to rate it five stars."/>
+            <column name="created_at" valueComputed="now() - interval '5 hours'"/>
+        </insert>
+        <!-- John Davis (u1) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000056"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000001"/>
+            <column name="text" value="Old fountain, winding path, a park that somehow feels bigger than the city around it. Perfect spot for a slow Sunday walk."/>
+            <column name="created_at" valueComputed="now() - interval '4 hours'"/>
+        </insert>
+        <!-- Jamal Pearson (u2) -->
+        <insert tableName="post">
+            <column name="id" value="00000000-0000-0000-0002-000000000057"/>
+            <column name="author_id" value="00000000-0000-0000-0001-000000000002"/>
+            <column name="text" value="A whole group of us picking a line through the roots and fog - nobody talking, everybody focused."/>
+            <column name="created_at" valueComputed="now() - interval '3 hours'"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-011-more-post-media" author="robert.sereda" context="seed">
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000046"/>
+            <column name="stored_file_name" value="post_image_2.png"/>
+            <column name="original_file_name" value="post_image_2.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="307329"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000003"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000047"/>
+            <column name="stored_file_name" value="post_image_3.png"/>
+            <column name="original_file_name" value="post_image_3.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="1131278"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000005"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000048"/>
+            <column name="stored_file_name" value="post_image_4.png"/>
+            <column name="original_file_name" value="post_image_4.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="1416506"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000010"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000049"/>
+            <column name="stored_file_name" value="post_image_5.png"/>
+            <column name="original_file_name" value="post_image_5.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="1399027"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000004"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000050"/>
+            <column name="stored_file_name" value="post_image_6.png"/>
+            <column name="original_file_name" value="post_image_6.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="2993356"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000007"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000051"/>
+            <column name="stored_file_name" value="post_image_7.png"/>
+            <column name="original_file_name" value="post_image_7.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="3073287"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000008"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000052"/>
+            <column name="stored_file_name" value="post_image_8.png"/>
+            <column name="original_file_name" value="post_image_8.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="2417433"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000009"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000053"/>
+            <column name="stored_file_name" value="post_image_10.png"/>
+            <column name="original_file_name" value="post_image_10.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="2487507"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000001"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000054"/>
+            <column name="stored_file_name" value="post_image_11.png"/>
+            <column name="original_file_name" value="post_image_11.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="2114634"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000008"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000055"/>
+            <column name="stored_file_name" value="post_image_17.png"/>
+            <column name="original_file_name" value="post_image_17.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="2024194"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000007"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000056"/>
+            <column name="stored_file_name" value="post_image_18.png"/>
+            <column name="original_file_name" value="post_image_18.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="1926554"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000002"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000057"/>
+            <column name="stored_file_name" value="post_image_19.png"/>
+            <column name="original_file_name" value="post_image_19.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="1666029"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000003"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000058"/>
+            <column name="stored_file_name" value="post_image_21.png"/>
+            <column name="original_file_name" value="post_image_21.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="1711994"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000003"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000059"/>
+            <column name="stored_file_name" value="post_image_22.png"/>
+            <column name="original_file_name" value="post_image_22.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="1685576"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000010"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000060"/>
+            <column name="stored_file_name" value="post_image_23.png"/>
+            <column name="original_file_name" value="post_image_23.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="1667057"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000002"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000061"/>
+            <column name="stored_file_name" value="post_image_25.png"/>
+            <column name="original_file_name" value="post_image_25.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="1541468"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000004"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000062"/>
+            <column name="stored_file_name" value="post_image_28.png"/>
+            <column name="original_file_name" value="post_image_28.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="1229683"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000009"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000063"/>
+            <column name="stored_file_name" value="post_image_31.png"/>
+            <column name="original_file_name" value="post_image_31.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="2954069"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000010"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000064"/>
+            <column name="stored_file_name" value="post_image_32.png"/>
+            <column name="original_file_name" value="post_image_32.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="2834876"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000002"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000065"/>
+            <column name="stored_file_name" value="post_image_35.png"/>
+            <column name="original_file_name" value="post_image_35.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="2542070"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000006"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000066"/>
+            <column name="stored_file_name" value="post_image_36.png"/>
+            <column name="original_file_name" value="post_image_36.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="2918942"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000009"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000067"/>
+            <column name="stored_file_name" value="post_image_37.png"/>
+            <column name="original_file_name" value="post_image_37.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="2560877"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000002"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000068"/>
+            <column name="stored_file_name" value="post_image_39.png"/>
+            <column name="original_file_name" value="post_image_39.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="2428636"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000008"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000069"/>
+            <column name="stored_file_name" value="post_image_41.png"/>
+            <column name="original_file_name" value="post_image_41.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="2240157"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000006"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000070"/>
+            <column name="stored_file_name" value="post_image_44.png"/>
+            <column name="original_file_name" value="post_image_44.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="2041682"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000010"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000071"/>
+            <column name="stored_file_name" value="post_image_45.png"/>
+            <column name="original_file_name" value="post_image_45.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="2077804"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000006"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000072"/>
+            <column name="stored_file_name" value="post_image_47.png"/>
+            <column name="original_file_name" value="post_image_47.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="2034372"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000004"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000073"/>
+            <column name="stored_file_name" value="post_image_49.png"/>
+            <column name="original_file_name" value="post_image_49.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="2017979"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000007"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000074"/>
+            <column name="stored_file_name" value="post_image_50.png"/>
+            <column name="original_file_name" value="post_image_50.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="2053090"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000010"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000075"/>
+            <column name="stored_file_name" value="post_image_52.png"/>
+            <column name="original_file_name" value="post_image_52.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="1864779"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000007"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000076"/>
+            <column name="stored_file_name" value="post_image_53.png"/>
+            <column name="original_file_name" value="post_image_53.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="1934691"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000005"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000077"/>
+            <column name="stored_file_name" value="post_image_54.png"/>
+            <column name="original_file_name" value="post_image_54.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="1810998"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000006"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000078"/>
+            <column name="stored_file_name" value="post_image_55.png"/>
+            <column name="original_file_name" value="post_image_55.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="1886827"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000002"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000079"/>
+            <column name="stored_file_name" value="post_image_57.png"/>
+            <column name="original_file_name" value="post_image_57.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="1782481"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000010"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000080"/>
+            <column name="stored_file_name" value="post_image_60.png"/>
+            <column name="original_file_name" value="post_image_60.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="1173679"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000001"/>
+        </insert>
+        <insert tableName="media">
+            <column name="id" value="00000000-0000-0000-0010-000000000081"/>
+            <column name="stored_file_name" value="post_image_61.png"/>
+            <column name="original_file_name" value="post_image_61.png"/>
+            <column name="mime_type" value="image/png"/>
+            <column name="size" valueNumeric="1490669"/>
+            <column name="owner_id" value="00000000-0000-0000-0001-000000000002"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-011-more-post-image-assignments" author="robert.sereda" context="seed">
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000046"/>
+            <where>id = '00000000-0000-0000-0002-000000000022'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000047"/>
+            <where>id = '00000000-0000-0000-0002-000000000023'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000048"/>
+            <where>id = '00000000-0000-0000-0002-000000000024'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000049"/>
+            <where>id = '00000000-0000-0000-0002-000000000025'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000050"/>
+            <where>id = '00000000-0000-0000-0002-000000000026'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000051"/>
+            <where>id = '00000000-0000-0000-0002-000000000027'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000052"/>
+            <where>id = '00000000-0000-0000-0002-000000000028'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000053"/>
+            <where>id = '00000000-0000-0000-0002-000000000029'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000054"/>
+            <where>id = '00000000-0000-0000-0002-000000000030'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000055"/>
+            <where>id = '00000000-0000-0000-0002-000000000031'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000056"/>
+            <where>id = '00000000-0000-0000-0002-000000000032'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000057"/>
+            <where>id = '00000000-0000-0000-0002-000000000033'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000058"/>
+            <where>id = '00000000-0000-0000-0002-000000000034'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000059"/>
+            <where>id = '00000000-0000-0000-0002-000000000035'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000060"/>
+            <where>id = '00000000-0000-0000-0002-000000000036'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000061"/>
+            <where>id = '00000000-0000-0000-0002-000000000037'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000062"/>
+            <where>id = '00000000-0000-0000-0002-000000000038'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000063"/>
+            <where>id = '00000000-0000-0000-0002-000000000039'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000064"/>
+            <where>id = '00000000-0000-0000-0002-000000000040'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000065"/>
+            <where>id = '00000000-0000-0000-0002-000000000041'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000066"/>
+            <where>id = '00000000-0000-0000-0002-000000000042'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000067"/>
+            <where>id = '00000000-0000-0000-0002-000000000043'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000068"/>
+            <where>id = '00000000-0000-0000-0002-000000000044'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000069"/>
+            <where>id = '00000000-0000-0000-0002-000000000045'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000070"/>
+            <where>id = '00000000-0000-0000-0002-000000000046'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000071"/>
+            <where>id = '00000000-0000-0000-0002-000000000047'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000072"/>
+            <where>id = '00000000-0000-0000-0002-000000000048'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000073"/>
+            <where>id = '00000000-0000-0000-0002-000000000049'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000074"/>
+            <where>id = '00000000-0000-0000-0002-000000000050'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000075"/>
+            <where>id = '00000000-0000-0000-0002-000000000051'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000076"/>
+            <where>id = '00000000-0000-0000-0002-000000000052'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000077"/>
+            <where>id = '00000000-0000-0000-0002-000000000053'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000078"/>
+            <where>id = '00000000-0000-0000-0002-000000000054'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000079"/>
+            <where>id = '00000000-0000-0000-0002-000000000055'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000080"/>
+            <where>id = '00000000-0000-0000-0002-000000000056'</where>
+        </update>
+        <update tableName="post">
+            <column name="image_media_id" value="00000000-0000-0000-0010-000000000081"/>
+            <where>id = '00000000-0000-0000-0002-000000000057'</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

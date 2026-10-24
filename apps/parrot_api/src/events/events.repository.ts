@@ -8,12 +8,18 @@ export interface EventRow {
   description: string;
   image_media_id: string | null;
   starts_at: Date;
+  location: string | null;
+  created_by: string;
+  organizer_first_name: string;
+  organizer_last_name: string;
   interested: boolean;
   interested_count: number;
 }
 
 // Same double-subquery shape as PostsRepository's POST_SELECT: count(*) cast to ::int and
 // EXISTS cast to a native bool so DTO fields aren't numeric/boolean-looking strings.
+// created_by is NOT NULL with a FK to users (see 011-event-organizer.xml), so an inner JOIN
+// for the organizer's name is safe here, unlike groups which looks the owner up separately.
 const EVENT_SELECT = `
   SELECT
     e.id,
@@ -21,11 +27,16 @@ const EVENT_SELECT = `
     e.description,
     e.image_media_id,
     e.starts_at,
+    e.location,
+    e.created_by,
+    u.first_name AS organizer_first_name,
+    u.last_name AS organizer_last_name,
     EXISTS (
       SELECT 1 FROM event_interest ei WHERE ei.event_id = e.id AND ei.user_id = $1
     ) AS interested,
     (SELECT count(*)::int FROM event_interest ei WHERE ei.event_id = e.id) AS interested_count
   FROM event e
+  JOIN users u ON u.id = e.created_by
 `;
 
 @Injectable()
@@ -76,17 +87,19 @@ export class EventsRepository {
     title: string;
     description: string;
     startsAt: string;
+    location?: string;
     imageMediaId?: string;
     createdBy: string;
   }): Promise<string> {
     const result = await this.pool.query<{ id: string }>(
-      `INSERT INTO event (title, description, starts_at, image_media_id, created_by)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO event (title, description, starts_at, location, image_media_id, created_by)
+       VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id`,
       [
         input.title,
         input.description,
         input.startsAt,
+        input.location ?? null,
         input.imageMediaId ?? null,
         input.createdBy,
       ],

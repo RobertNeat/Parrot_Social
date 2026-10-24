@@ -52,9 +52,14 @@ function toTimeAgo(iso: string): string {
 export function toLocalNotification(dto: NotificationDto): AppNotification {
   return {
     id: dto.id,
+    type: dto.type,
     icon: ICON_BY_TYPE[dto.type],
     text: renderText(dto.type, dto.actorName),
     timeAgo: toTimeAgo(dto.createdAt),
     read: dto.read,
+    actorId: dto.actorId,
+    targetId: dto.targetId,
+    friendshipRequestId: dto.friendshipRequestId,
+    friendshipStatus: dto.friendshipStatus,
   };
 }

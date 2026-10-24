@@ -23,6 +23,8 @@ export async function toNotificationDto(
       ? await mediaRefBuilder.buildRefForMediaId(row.actor_avatar_media_id, res)
       : undefined,
     targetId: row.target_id ?? undefined,
+    friendshipRequestId: row.friendship_id ?? undefined,
+    friendshipStatus: row.friendship_status ?? undefined,
     createdAt: row.created_at.toISOString(),
     read: row.read,
   };

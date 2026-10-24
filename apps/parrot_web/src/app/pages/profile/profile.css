@@ -118,6 +118,21 @@
   opacity: 0.9;
 }
 
+.friendship-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+}
+
+.friendship-actions .badge {
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--panel-border);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
 .composer {
   display: flex;
   align-items: center;

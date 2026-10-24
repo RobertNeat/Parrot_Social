@@ -25,4 +25,6 @@ export * from './chat/conversation.dto.js';
 
 export * from './notification/notification.dto.js';
 
+export * from './friendship/friendship.dto.js';
+
 export * from './search/search.dto.js';

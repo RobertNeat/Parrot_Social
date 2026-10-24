@@ -13,9 +13,15 @@ export interface NotificationRow {
   actor_first_name: string | null;
   actor_last_name: string | null;
   actor_avatar_media_id: string | null;
+  friendship_id: string | null;
+  friendship_status: 'pending' | 'accepted' | null;
 }
 
-// LEFT JOIN - actor_id is nullable (system notifications like event-reminder have no actor).
+// LEFT JOIN actor - actor_id is nullable (system notifications like event-reminder have no actor).
+// LEFT JOIN friendship on the (actor, recipient) pair, not n.target_id - the seed data
+// (seed-006-notifications) doesn't populate target_id for the friend-request row, and this join
+// also keeps working after the request is accepted/declined (status/row presence reflects the
+// live friendship, independent of what target_id happened to store at insert time).
 const NOTIFICATION_SELECT = `
   SELECT
     n.id,
@@ -27,9 +33,14 @@ const NOTIFICATION_SELECT = `
     actor.username AS actor_username,
     actor.first_name AS actor_first_name,
     actor.last_name AS actor_last_name,
-    actor.avatar_media_id AS actor_avatar_media_id
+    actor.avatar_media_id AS actor_avatar_media_id,
+    f.id AS friendship_id,
+    f.status AS friendship_status
   FROM notification n
   LEFT JOIN users actor ON actor.id = n.actor_id
+  LEFT JOIN friendship f ON n.type = 'friend-request'
+    AND ((f.requester_id = n.actor_id AND f.addressee_id = n.recipient_id)
+      OR (f.requester_id = n.recipient_id AND f.addressee_id = n.actor_id))
 `;
 
 @Injectable()

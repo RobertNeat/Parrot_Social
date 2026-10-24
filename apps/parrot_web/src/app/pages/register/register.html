@@ -1,5 +1,7 @@
 <div class="auth-page">
   <form class="auth-card panel" [formGroup]="form" (ngSubmit)="submit()">
+    <h1 class="brand-heading">Parrot <span class="gradient-text">Social</span></h1>
+
     <input class="input" type="text" placeholder="username" formControlName="username" />
     @if (submitted() && form.controls.username.invalid) {
       <span class="field-error">Username is required.</span>
