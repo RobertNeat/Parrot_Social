@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="apps/parrot_web/public/parrot_image.png" width="150" alt="HIS logo">
+  <img src="apps/parrot_web/public/parrot_white_bg.png" width="150" alt="HIS logo">
 </p>
 
 <h1 align="center">ParrotSocial - social media platform</h1>
@@ -11,6 +11,7 @@ ParrotSocial to kompletna platforma społecznościowa łącząca ludzi wokół t
 # Used technologies
 
 ### Bezpieczeństwo
+
 - **Własna implementacja hashowania haseł (`node:crypto` scrypt)** — hasła nigdy nie trafiają do bazy w czystej formie; każde hasło jest solone losową 16-bajtową solą i przetwarzane przez `scrypt`, algorytm odporny na łamanie przy użyciu kart graficznych (GPU/ASIC).
 - **Porównanie haszy w czasie stałym (`timingSafeEqual`)** — zabezpiecza logowanie przed atakami typu timing-attack, czyli odgadywaniem hasła na podstawie czasu odpowiedzi serwera.
 - **Logowanie przez tokeny JWT** z wymuszonym sekretem konfiguracyjnym i czasem życia tokenu — dostęp do aplikacji jest zawsze weryfikowany, a brak klucza konfiguracyjnego zatrzymuje start serwera (fail-fast) zamiast działać w niebezpiecznym trybie.
@@ -20,6 +21,7 @@ ParrotSocial to kompletna platforma społecznościowa łącząca ludzi wokół t
 - **Kontenery działające z ograniczonymi uprawnieniami** — aplikacja nie działa jako administrator systemu (root), co ogranicza skutki potencjalnego włamania.
 
 ### Baza danych
+
 - **PostgreSQL** jako główna baza danych — przechowuje użytkowników, posty, komentarze, grupy, wydarzenia, wiadomości i powiadomienia.
 - **Liquibase** do zarządzania wersjami struktury bazy danych oraz do zasilania środowiska danymi testowymi (seed) — każda zmiana w strukturze bazy jest opisana, odwracalna i możliwa do odtworzenia na każdym środowisku.
 - **Starannie zaprojektowane relacje między danymi** — reguły usuwania dopasowane do sensu biznesowego (np. usunięcie konta nie usuwa cichcem historii czatu innym uczestnikom rozmowy), indeksy przyspieszające najczęstsze operacje (np. szybkie wczytywanie historii czatu i powiadomień).
@@ -27,17 +29,20 @@ ParrotSocial to kompletna platforma społecznościowa łącząca ludzi wokół t
 - **Transakcyjne bezpieczeństwo przy przesyłaniu plików** — jeśli zapis informacji o pliku do bazy się nie powiedzie, plik jest automatycznie usuwany z dysku, co zapobiega powstawaniu „osieroconych” danych.
 
 ### Backend
+
 - **NestJS (Node.js/TypeScript)** — modularna architektura serwera, gdzie każda funkcja biznesowa (konta, posty, grupy, wydarzenia, czat, powiadomienia, media) jest odseparowanym, niezależnie testowalnym modułem.
 - **Współdzielone typy danych między frontendem i backendem** (osobny pakiet `shared-dto`) — eliminuje niezgodności danych między aplikacją w przeglądarce i serwerem.
 - **Wzorzec Mapper** oddzielający dane bazy od danych wysyłanych do użytkownika — pozwala zmieniać wewnętrzną strukturę bazy bez wpływu na frontend.
 - **Przejrzysta obsługa błędów bazy danych** — zamiast ujawniania szczegółów technicznych, aplikacja zwraca użytkownikowi zrozumiałe komunikaty (np. „ten adres e-mail jest już zajęty”).
 
 ### Frontend
+
 - **Angular 22** z najnowszymi mechanizmami frameworka (Signals, komponenty standalone, leniwe wczytywanie stron) — aplikacja jest szybka i responsywna, a strony ładują się tylko wtedy, kiedy są potrzebne.
 - **Spójna obsługa sesji logowania** — automatyczne dołączanie tokenu użytkownika do każdego zapytania oraz płynne odtwarzanie sesji po odświeżeniu strony, bez niepotrzebnego wylogowywania przy chwilowych problemach z siecią.
 - **Nowoczesny, funkcyjny styl pisania komponentów** — czytelny, łatwy w utrzymaniu i rozwijaniu kod interfejsu.
 
 ### DevOps i infrastruktura
+
 - **Docker i Docker Compose** — cała platforma (baza danych, migracje, backend, frontend) uruchamia się jednym poleceniem, identycznie na komputerze dewelopera i na serwerze produkcyjnym.
 - **Zautomatyzowane budowanie obrazów (multi-stage Docker build)** — finalne obrazy aplikacji są lekkie i zawierają tylko to, co potrzebne do działania, bez narzędzi developerskich.
 - **Frontend serwowany przez nginx** — sprawdzony, wydajny serwer WWW używany przez największe serwisy internetowe na świecie.
@@ -46,6 +51,7 @@ ParrotSocial to kompletna platforma społecznościowa łącząca ludzi wokół t
 - **Health-checki usług** — system sam sprawdza, czy baza danych i serwer są gotowe do pracy, zanim wystartuje kolejny element platformy, co eliminuje błędy przy starcie.
 
 ### Jakość kodu i testy
+
 - **Testy jednostkowe i end-to-end (Vitest)** — w tym testy napisane specjalnie pod kątem scenariuszy bezpieczeństwa (np. próba użycia wygasłego lub cudzego tokenu dostępu do zdjęcia).
 - **Statyczna analiza kodu (oxlint) i automatyczne formatowanie (Prettier)** — spójny, czytelny styl kodu w całym projekcie.
 - **TypeScript w trybie strict** w każdej części projektu — błędy w typach danych są wychwytywane zanim kod trafi na serwer.
@@ -54,12 +60,48 @@ ParrotSocial to kompletna platforma społecznościowa łącząca ludzi wokół t
 # Features
 
 - **Konto i logowanie** — rejestracja, logowanie (nazwą użytkownika lub e-mailem), bezpieczne wylogowanie oraz proces wdrożenia nowego użytkownika (onboarding) po pierwszym zalogowaniu.
+
+<p align="center">
+  <img src="/docs/media/login.png" alt="login" width="80%">
+  <img src="/docs/media/register.png" alt="register" width="80%">
+</p>
+
 - **Profil użytkownika** — edycja danych osobowych (opis, praca, edukacja, status związku, lokalizacja), zmiana zdjęcia profilowego i zdjęcia w tle, przeglądanie profili innych osób wraz z ich aktywnością.
+
+<p align="center">
+  <img src="/docs/media/user_profile.png" alt="user profile" width="80%">
+</p>
+
 - **Tablica i posty** — publikowanie postów z tekstem i zdjęciem, usuwanie własnych wpisów, polubienia i głosy „upvote”, komentowanie wpisów innych użytkowników.
+
+<p align="center">
+  <img src="/docs/media/user_feed.png" alt="user feed" width="80%">
+</p>
+
 - **Znajomi i kontakty** — lista znajomych, zarządzanie kontaktami i relacjami między użytkownikami.
+
+<p align="center">
+  <img src="/docs/media/other_user_profile.png" alt="other user profile" width="80%">
+</p>
+
 - **Grupy** — przeglądanie i tworzenie grup zainteresowań, dołączanie i opuszczanie grup, własna tablica postów widoczna tylko dla członków grupy, lista uczestników.
+
+<p align="center">
+  <img src="/docs/media/group_feed.png" alt="group feed" width="80%">
+</p>
+
 - **Wydarzenia** — przeglądanie i tworzenie wydarzeń, oznaczanie zainteresowania udziałem oraz wycofywanie deklaracji.
+
+<p align="center">
+  <img src="/docs/media/events.png" alt="events" width="80%">
+</p>
+
 - **Czat w czasie rzeczywistym** — lista konwersacji, wysyłanie wiadomości tekstowych i ze zdjęciami, dostęp ograniczony wyłącznie do uczestników rozmowy.
+
+<p align="center">
+  <img src="/docs/media/chat.png" alt="chat" width="80%">
+</p>
+
 - **Powiadomienia** — lista aktywności dotyczących użytkownika oraz możliwość oznaczenia wszystkich powiadomień jako przeczytane.
 - **Wyszukiwanie** — szybkie znajdowanie osób, grup i wydarzeń w ramach platformy.
 - **Media** — bezpieczne przesyłanie i przechowywanie zdjęć (profilowych, w postach, w czacie) z ochroną przed nieautoryzowanym dostępem.
