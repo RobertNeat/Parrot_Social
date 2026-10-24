@@ -1,4 +1,5 @@
-export type FriendshipStatus = 'none' | 'pending_sent' | 'pending_received' | 'friends';
+export type FriendshipStatus =
+  'none' | 'pending_sent' | 'pending_received' | 'friends';
 
 /** Viewer-relative status between the caller and a target user, plus the friendship row id
  * (needed by the caller to accept/decline when status is pending_received, or to know what to
