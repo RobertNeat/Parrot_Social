@@ -6,3 +6,6 @@ allowBuilds:
   esbuild: true
   lmdb: true
   msgpackr-extract: true
+overrides:
+  body-parser: ^2.4.0
+  multer: ^2.5.0
